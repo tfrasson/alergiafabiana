@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clivped · Sistema de Gestão — Alergologia</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--cv:#00A79D;--cvd:#007A72;--cvl:#E6F7F6;--bg:#F4F6F8;--sf:#FFF;--bd:#E2E8EF;--tx:#1A2332;--t2:#4A5568;--t3:#8FA0B4;--red:#E53E3E;--rbg:#FFF5F5;--grn:#2F855A;--gbg:#F0FFF4;--amb:#B7791F;--abg:#FFFBEB;--blu:#2B6CB0;--bbg:#EBF8FF;--sh:0 1px 3px rgba(0,0,0,.06);--sha:0 4px 12px rgba(0,0,0,.08);--r:12px;--rs:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--sf);border-bottom:1px solid var(--bd);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--sh)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-ico{width:36px;height:36px;background:var(--cv);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.brand-ico svg{width:22px;height:22px;fill:white}
+.brand-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;color:var(--cv);letter-spacing:-.3px}
+.brand-sub{font-size:11px;color:var(--t3)}
+.tb-right{display:flex;align-items:center;gap:14px}
+.tb-clinic{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:6px}
+.cdot{width:6px;height:6px;border-radius:50%;background:var(--cv)}
+.tb-date{font-size:11px;color:var(--t3);background:var(--bg);padding:5px 10px;border-radius:6px;border:1px solid var(--bd)}
+.tb-user{width:32px;height:32px;border-radius:50%;background:var(--cvl);border:2px solid var(--cv);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--cvd)}
+.layout{display:flex;flex:1}
+.sidebar{width:215px;background:var(--sf);border-right:1px solid var(--bd);padding:18px 10px;display:flex;flex-direction:column;gap:2px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+.nlabel{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;padding:10px 8px 5px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:var(--rs);cursor:pointer;font-size:13px;color:var(--t2);transition:all .15s;border:1px solid transparent}
+.ni:hover{background:var(--bg);color:var(--tx)}
+.ni.active{background:var(--cvl);color:var(--cvd);font-weight:500;border-color:rgba(0,167,157,.15)}
+.ni .ic{font-size:15px;width:19px;text-align:center}
+.nb{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px}
+.nbok{margin-left:auto;background:var(--cvl);color:var(--cvd);font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px}
+.sfooter{margin-top:auto;padding:12px 8px;border-top:1px solid var(--bd);font-size:11px;color:var(--t3);line-height:1.6}
+.sfooter a{color:var(--cv);text-decoration:none}.sfooter strong{color:var(--cv)}
+.main{flex:1;padding:22px;overflow-y:auto}
+.page{display:none}.page.active{display:block;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.ptitle{font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.3px}
+.psub{font-size:12px;color:var(--t3);margin-top:2px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:18px;box-shadow:var(--sh)}
+.ctitle{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.ctitle span{font-size:10px;color:var(--t3);font-weight:400}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.g5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.met{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:15px 17px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.met::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cv);border-radius:3px 3px 0 0}
+.met.red::before{background:var(--red)}.met.amb::before{background:#D97706}.met.blu::before{background:var(--blu)}.met.grn::before{background:var(--grn)}
+.ml{font-size:11px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.mv{font-family:'Plus Jakarta Sans',sans-serif;font-size:21px;font-weight:700;letter-spacing:-.5px}
+.ms{font-size:11px;color:var(--t3);margin-top:3px}
+.up{color:var(--grn);font-weight:500}.dn{color:var(--red);font-weight:500}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:6px;font-size:11px;font-weight:500;white-space:nowrap}
+.b-it{background:#EBF8FF;color:var(--blu)}.b-multi{background:#F0FFF4;color:var(--grn)}
+.b-laser{background:#FAF5FF;color:#6B46C1}.b-patch{background:#FFFBEB;color:var(--amb)}
+.b-con{background:var(--cvl);color:var(--cvd)}.b-tpo{background:#FFF5F5;color:var(--red)}
+.b-din{background:#F0FFF4;color:var(--grn)}.b-cred{background:#FFFBEB;color:var(--amb)}
+.b-deb{background:#EBF8FF;color:var(--blu)}.b-dep{background:var(--cvl);color:var(--cvd)}
+.b-cheq{background:#FFF5F5;color:var(--red)}
+.b-pg{background:#F0FFF4;color:var(--grn);border:1px solid #9AE6B4}
+.b-pnd{background:#FFFBEB;color:var(--amb);border:1px solid #F6E05E}
+.b-vnc{background:#FFF5F5;color:var(--red);border:1px solid #FEB2B2}
+.b-novo{background:var(--cvl);color:var(--cvd);border:1px solid rgba(0,167,157,.3);font-size:10px;padding:1px 6px}
+.twrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{padding:9px 13px;text-align:left;font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--bd);background:#FAFBFC;white-space:nowrap}
+tbody td{padding:10px 13px;border-bottom:1px solid var(--bd);color:var(--tx);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#FAFBFC}
+.nm{font-weight:500}
+.fs{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:20px;box-shadow:var(--sh);margin-bottom:16px}
+.fh{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:13px;border-bottom:1px solid var(--bd)}
+.fic{width:34px;height:34px;border-radius:9px;background:var(--cvl);display:flex;align-items:center;justify-content:center;font-size:17px}
+.ftit{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700}
+.fsub{font-size:12px;color:var(--t3)}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:11px;font-weight:500;color:var(--t2)}
+.fg input,.fg select{padding:8px 11px;border:1.5px solid var(--bd);border-radius:var(--rs);background:#FAFBFC;color:var(--tx);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+.fg input:focus,.fg select:focus{border-color:var(--cv);background:#fff;box-shadow:0 0 0 3px rgba(0,167,157,.1)}
+.fg input[readonly]{color:var(--t3);background:var(--bg)}
+.bp{padding:9px 18px;background:var(--cv);color:#fff;border:none;border-radius:var(--rs);font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .15s}
+.bp:hover{background:var(--cvd)}
+.bs{padding:9px 14px;background:#fff;color:var(--t2);border:1.5px solid var(--bd);border-radius:var(--rs);font-size:13px;cursor:pointer}
+.bs:hover{background:var(--bg)}
+.ppv{background:#FAFBFC;border:1px solid var(--bd);border-radius:var(--rs);padding:11px 13px;margin-top:9px;display:none}
+.ppvt{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+.pt{display:flex;gap:3px;flex-wrap:wrap}
+.pp{width:27px;height:27px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;border:1.5px solid transparent}
+.pp-pg{background:#F0FFF4;color:var(--grn);border-color:#9AE6B4}
+.pp-ft{background:#EBF8FF;color:var(--blu);border-color:#90CDF4}
+.pb{height:5px;background:var(--bd);border-radius:10px;overflow:hidden;margin-top:3px}
+.pbf{height:100%;border-radius:10px;background:var(--cv)}
+.bi{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);margin-bottom:7px;gap:11px;transition:box-shadow .15s}
+.bi:hover{box-shadow:var(--sha)}
+.bi.sv{border-left:3px solid var(--red)}.bi.sp{border-left:3px solid #D97706}.bi.sg{border-left:3px solid var(--grn)}
+.msg{padding:9px 13px;border-radius:var(--rs);font-size:12px;font-weight:500;margin-top:10px;display:none}
+.msg.ok{background:var(--gbg);color:var(--grn);border:1px solid #9AE6B4;display:flex;align-items:center;gap:5px}
+.msg.er{background:var(--rbg);color:var(--red);border:1px solid #FEB2B2;display:flex;align-items:center;gap:5px}
+.fbar{display:flex;align-items:center;gap:9px;margin-bottom:12px;flex-wrap:wrap}
+.srch{padding:7px 11px 7px 32px;border:1.5px solid var(--bd);border-radius:var(--rs);background:#fff;color:var(--tx);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;flex:1;min-width:160px;max-width:280px}
+.srch:focus{border-color:var(--cv)}
+.sw{position:relative}
+.si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:13px;pointer-events:none}
+.fsel{padding:7px 11px;border:1.5px solid var(--bd);border-radius:var(--rs);background:#fff;color:var(--t2);font-size:12px;outline:none}
+.leg{display:flex;flex-wrap:wrap;gap:11px;margin-bottom:9px;font-size:11px;color:var(--t2)}
+.li{display:flex;align-items:center;gap:4px}
+.ls{width:10px;height:10px;border-radius:2px}
+.info{padding:12px 14px;background:var(--cvl);border-left:3px solid var(--cv);border-radius:0 var(--rs) var(--rs) 0;font-size:12px;color:var(--cvd);line-height:1.6;margin-bottom:13px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;background:var(--cvl);border:1px solid rgba(0,167,157,.2);border-radius:20px;font-size:12px;color:var(--cvd);font-weight:500}
+.cx{cursor:pointer;color:var(--t3);font-size:13px}.cx:hover{color:var(--red)}
+.car{display:flex;gap:7px}
+.car input{flex:1;padding:7px 11px;border:1.5px solid var(--bd);border-radius:var(--rs);background:#fff;color:var(--tx);font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
+.car input:focus{border-color:var(--cv)}
+.bl-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:0.5px solid var(--bd);font-size:13px}
+.bl-row:last-child{border-bottom:none}
+.bl-tot{background:var(--cvl);border-radius:var(--rs);padding:11px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:9px}
+.ytab{display:flex;gap:4px;flex-wrap:wrap}
+.yt{padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;border:1.5px solid var(--bd);background:#fff;color:var(--t2);font-weight:500;transition:all .15s}
+.yt.active,.yt:hover{background:var(--cv);border-color:var(--cv);color:#fff}
+.yt.novo{border-color:var(--cv);color:var(--cvd)}
+.empty{text-align:center;padding:28px;color:var(--t3);font-size:13px}
+.utag{padding:4px 10px;background:var(--cvl);color:var(--cvd);border-radius:20px;font-size:11px;font-weight:500;border:1px solid rgba(0,167,157,.2)}
+.utags{display:flex;flex-wrap:wrap;gap:5px}
+.save-tip{background:var(--gbg);border:1px solid #9AE6B4;border-radius:var(--rs);padding:12px 16px;font-size:12px;color:var(--grn);margin-bottom:16px;display:flex;align-items:flex-start;gap:8px;line-height:1.6}
+.db-box{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:18px;box-shadow:var(--sh);margin-bottom:14px}
+.db-stat{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--bd);font-size:13px}
+.db-stat:last-child{border-bottom:none}
+.db-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn-danger{padding:8px 16px;background:#FFF5F5;color:var(--red);border:1.5px solid #FEB2B2;border-radius:var(--rs);font-size:12px;font-weight:500;cursor:pointer;transition:background .15s}
+.btn-danger:hover{background:#FED7D7}
+.btn-export{padding:8px 16px;background:var(--gbg);color:var(--grn);border:1.5px solid #9AE6B4;border-radius:var(--rs);font-size:12px;font-weight:500;cursor:pointer;transition:background .15s}
+.btn-export:hover{background:#C6F6D5}
+.tcard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
+.alert-2026{background:var(--cvl);border:1px solid rgba(0,167,157,.3);border-radius:var(--rs);padding:10px 14px;font-size:12px;color:var(--cvd);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal-box{background:var(--sf);border-radius:var(--r);padding:24px;width:95%;max-width:480px;box-shadow:0 12px 40px rgba(0,0,0,.15);animation:fi .2s ease}
+.modal-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--t3);padding:4px 8px;border-radius:6px}
+.modal-close:hover{background:var(--bg);color:var(--red)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.btn-row{display:flex;gap:4px;justify-content:flex-end}
+.btn-edit{padding:4px 8px;background:var(--cvl);color:var(--cvd);border:1px solid rgba(0,167,157,.2);border-radius:5px;font-size:11px;cursor:pointer;white-space:nowrap}
+.btn-edit:hover{background:var(--cv);color:#fff}
+.btn-del{padding:4px 8px;background:var(--rbg);color:var(--red);border:1px solid #FEB2B2;border-radius:5px;font-size:11px;cursor:pointer;white-space:nowrap}
+.btn-del:hover{background:var(--red);color:#fff}
+.ac-wrap{position:relative}
+.ac-list{display:none;position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--sf);border:1.5px solid var(--cv);border-top:none;border-radius:0 0 var(--rs) var(--rs);max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.ac-list.show{display:block}
+.ac-item{padding:9px 13px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd)}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.active{background:var(--cvl);color:var(--cvd)}
+.ac-item .ac-name{font-weight:500}
+.ac-item .ac-info{font-size:10px;color:var(--t3);display:flex;gap:6px;align-items:center}
+.ac-hint{font-size:10px;color:var(--t3);margin-top:2px;display:none}
+.ac-hint.show{display:block}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-ico"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg></div>
+    <div><div class="brand-name">Clivped</div><div class="brand-sub">Sistema de Gestão · Alergologia</div></div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-clinic"><div class="cdot"></div>Dra. Fabiana · Alergologia</div>
+    <div id="db-indicator" style="display:flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--bg);cursor:pointer" onclick="window.goto('conf',document.querySelectorAll('.ni')[7])" title="Banco local — clique para gerenciar">
+      <span id="db-dot" style="width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0"></span>
+      <span id="db-label" style="color:var(--t3)">Carregando...</span>
+    </div>
+    <div class="tb-date" id="tbdate"></div>
+    <div class="tb-user">AD</div>
+  </div>
+</div>
+<div class="layout">
+<div class="sidebar">
+  <div class="nlabel">Principal</div>
+  <div class="ni active" onclick="window.goto('dash',this)"><span class="ic">📊</span>Dashboard</div>
+  <div class="ni" onclick="window.goto('cad',this)"><span class="ic">➕</span>Novo Atendimento</div>
+  <div class="ni" onclick="window.goto('todos',this)"><span class="ic">👥</span>Todos os Pacientes <span class="nbok" id="nb-todos">771</span></div>
+  <div class="nlabel">Financeiro</div>
+  <div class="ni" onclick="window.goto('parc',this)"><span class="ic">💳</span>Parcelamentos<span class="nbok">53</span></div>
+  <div class="ni" onclick="window.goto('bol',this)"><span class="ic">📋</span>Boletos<span class="nb" id="nb-bol">4</span></div>
+  <div class="ni" onclick="window.goto('proj',this)"><span class="ic">📈</span>Projeção 2026</div>
+  <div class="nlabel">Sistema</div>
+  <div class="ni" onclick="window.goto('conf',this)"><span class="ic">⚙️</span>Configurações</div>
+  <div class="sfooter"><strong>Clivped Vacinas</strong><br>Cuidando com amor,<br>vacinando com excelência!<br><a href="https://clivped.com.br" target="_blank">www.clivped.com.br</a><br><span style="font-size:10px">Dados 2019–2026 · planilha real</span></div>
+</div>
+<div class="main">
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dash">
+  <div class="ph">
+    <div><div class="ptitle">Dashboard</div><div class="psub">Visão geral — Dra. Fabiana · Alergologia · Colatina-ES</div></div>
+    <div class="utags"><span class="utag">Colatina</span><span class="utag">Linhares</span><span class="utag">S. Gabriel</span><span class="utag">Vitória</span></div>
+  </div>
+
+  <!-- KPIs 2026 em destaque -->
+  <div class="alert-2026">
+    <span style="font-size:18px">🟢</span>
+    <span><strong>2026 em andamento</strong> · Jan e Fev já registrados · 103 pacientes · R$ 48.845 · Ticket médio R$ 474 · Jan +14% e Fev +5% vs mesmo período de 2025</span>
+  </div>
+
+  <div class="g5">
+    <div class="met" style="border-color:rgba(0,167,157,.3)">
+      <div class="ml">Pacientes 2026 <span class="b-novo">Atual</span></div>
+      <div class="mv" style="color:var(--cvd)">103</div>
+      <div class="ms"><span class="up">Jan+Fev completos</span></div>
+    </div>
+    <div class="met" style="border-color:rgba(0,167,157,.3)">
+      <div class="ml">Receita 2026 <span class="b-novo">Atual</span></div>
+      <div class="mv" style="color:var(--cvd)">R$ 48,8k</div>
+      <div class="ms"><span class="up">+10% vs Jan-Fev/2025</span></div>
+    </div>
+    <div class="met grn">
+      <div class="ml">Ticket médio 2026</div>
+      <div class="mv">R$ 474</div>
+      <div class="ms"><span class="up">↑ 5%</span> vs 2025 (R$452)</div>
+    </div>
+    <div class="met">
+      <div class="ml">Receita total 2025</div>
+      <div class="mv">R$ 302k</div>
+      <div class="ms"><span class="up">↑ 78%</span> vs 2024</div>
+    </div>
+    <div class="met red">
+      <div class="ml">Boletos abertos</div>
+      <div class="mv dn" id="kpi-bol">R$ 8.302</div>
+      <div class="ms" id="kpi-bol-ct">4 pendentes</div>
+    </div>
+  </div>
+
+  <!-- Receita mensal + Acumulado -->
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">Receita mensal
+        <div class="ytab" style="margin:0;gap:3px">
+          <div class="yt novo active" onclick="window.switchMensal(2026,this)" style="padding:3px 10px;font-size:11px">2026 ✦</div>
+          <div class="yt" onclick="window.switchMensal(2025,this)" style="padding:3px 10px;font-size:11px">2025</div>
+          <div class="yt" onclick="window.switchMensal(2024,this)" style="padding:3px 10px;font-size:11px">2024</div>
+          <div class="yt" onclick="window.switchMensal(2023,this)" style="padding:3px 10px;font-size:11px">2023</div>
+        </div>
+      </div>
+      <div style="position:relative;height:190px"><canvas id="cMensal"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Receita acumulada no ano <span>2024 · 2025 · 2026</span></div>
+      <div class="leg">
+        <div class="li"><div class="ls" style="background:#00A79D"></div>2026</div>
+        <div class="li"><div class="ls" style="background:rgba(0,167,157,.5)"></div>2025</div>
+        <div class="li"><div class="ls" style="background:rgba(0,167,157,.25)"></div>2024</div>
+      </div>
+      <div style="position:relative;height:170px"><canvas id="cAcum"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Crescimento + Ticket -->
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">Crescimento histórico <span>2019–2026</span></div>
+      <div class="leg"><div class="li"><div class="ls" style="background:#00A79D"></div>Receita</div><div class="li"><div class="ls" style="background:#4DC9C2"></div>Pacientes</div></div>
+      <div style="position:relative;height:175px"><canvas id="cCresc"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Ticket médio por ano <span>R$ por atendimento</span></div>
+      <div style="position:relative;height:175px"><canvas id="cTicket"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Pgto + Evol + Radar -->
+  <div class="g3">
+    <div class="card">
+      <div class="ctitle">Formas de pagamento <span id="pgto-ano-label">2026</span></div>
+      <div class="leg" id="legPgto"></div>
+      <div style="position:relative;height:155px"><canvas id="cPgto"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">IT vs Multitest <span>histórico</span></div>
+      <div class="leg"><div class="li"><div class="ls" style="background:#00A79D"></div>IT</div><div class="li"><div class="ls" style="background:#4DC9C2"></div>Multitest</div></div>
+      <div style="position:relative;height:155px"><canvas id="cEvol"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Sazonalidade mensal <span>pacientes/mês</span></div>
+      <div class="leg">
+        <div class="li"><div class="ls" style="background:#00A79D"></div>2026</div>
+        <div class="li"><div class="ls" style="background:rgba(229,62,62,.7)"></div>2025</div>
+        <div class="li"><div class="ls" style="background:rgba(43,108,176,.5)"></div>2024</div>
+      </div>
+      <div style="position:relative;height:155px"><canvas id="cRadar"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Balanço + Heatmap -->
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">Recebível cartão vs Boletos <span>2026 (Jan-Fev) + projeção</span></div>
+      <div class="leg"><div class="li"><div class="ls" style="background:#00A79D"></div>Recebível</div><div class="li"><div class="ls" style="background:#E53E3E"></div>Boleto</div><div class="li"><div class="ls" style="background:#2B6CB0"></div>Saldo</div></div>
+      <div style="position:relative;height:175px"><canvas id="cBal"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Heatmap de receita mensal <span>2022–2026</span></div>
+      <div id="heatmap-container" style="margin-top:4px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CADASTRO -->
+<div class="page" id="page-cad">
+  <div class="ph"><div><div class="ptitle">Novo Atendimento</div><div class="psub">Registrar paciente — Dra. Fabiana · Alergologia</div></div></div>
+  <div class="fs">
+    <div class="fh"><div class="fic">🧑‍⚕️</div><div><div class="ftit">Dados do Atendimento</div><div class="fsub">Preencha os campos para registrar</div></div></div>
+    <div class="fg2">
+      <div class="fg full"><label>Nome completo *</label><div class="ac-wrap"><input type="text" id="f-nome" placeholder="Ex: Maria Clara Rogerio" autocomplete="off" oninput="window.acBuscar(this.value)" onkeydown="window.acKeydown(event)"/><div class="ac-list" id="ac-list"></div></div><div class="ac-hint" id="ac-hint">💡 Paciente encontrado no banco de dados</div></div>
+      <div class="fg"><label>Data *</label><input type="date" id="f-data"/></div>
+      <div class="fg"><label>Unidade *</label><select id="f-unid"><option value="">Selecionar...</option><option>Colatina — Principal</option><option>Colatina — Tech Marista</option><option>Linhares</option><option>São Gabriel da Palha</option><option>Vitória — Praia do Canto</option><option>Vitória — Materlux</option><option>Atendimento Domiciliar</option></select></div>
+      <div class="fg"><label>Procedimento *</label><select id="f-tipo"></select></div>
+      <div class="fg"><label>Pagamento *</label><select id="f-pgto" onchange="window.onPgto()"></select></div>
+      <div class="fg"><label>Valor (R$) *</label><input type="number" id="f-valor" placeholder="0,00" oninput="window.calcParc()"/></div>
+      <div class="fg" id="f-parc-grp" style="display:none"><label>Por parcela</label><input type="text" id="f-parcela" readonly/></div>
+      <div class="fg full"><label>Observações</label><input type="text" id="f-obs" placeholder="Opcional"/></div>
+    </div>
+    <div class="ppv" id="ppv"><div class="ppvt">Projeção das parcelas</div><div class="pt" id="ppv-boxes"></div><div style="font-size:11px;color:var(--t3);margin-top:6px" id="ppv-txt"></div></div>
+    <div class="fa"><button class="bp" onclick="window.salvar()">✓ Salvar atendimento</button><button class="bs" onclick="window.limpar()">Limpar</button></div>
+    <div class="msg" id="f-msg"></div>
+  </div>
+  <div class="tcard">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--bd);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600">Registros desta sessão <span id="sess-ct" style="font-size:11px;color:var(--t3);font-weight:400"></span></div>
+    <div class="twrap"><table><thead><tr><th>Paciente</th><th>Data</th><th>Unidade</th><th>Procedimento</th><th>Pagamento</th><th>Valor</th><th>Parcelas</th></tr></thead><tbody id="t-sess"><tr><td colspan="7" class="empty">Nenhum registro nesta sessão</td></tr></tbody></table></div>
+  </div>
+</div>
+
+<!-- TODOS OS PACIENTES -->
+<div class="page" id="page-todos">
+  <div class="ph">
+    <div><div class="ptitle">Todos os Pacientes</div><div class="psub" id="todos-sub">Carregando...</div></div>
+  </div>
+  <div class="fbar">
+    <select class="fsel" id="flt-ano-todos" onchange="window.filtAnoTodos(this.value)"><option value="">Todos os anos</option></select>
+    <select class="fsel" onchange="window.filtTodos('mes',this.value)"><option value="">Todos os meses</option><option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option><option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option><option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select>
+    <select class="fsel" id="flt-tipo-todos" onchange="window.filtTodos('tipo',this.value)"><option value="">Todos os procedimentos</option></select>
+    <select class="fsel" id="flt-pgto-todos" onchange="window.filtTodos('pgto',this.value)"><option value="">Todos os pagamentos</option></select>
+    <div class="sw"><span class="si">🔍</span><input class="srch" type="text" placeholder="Buscar nome..." oninput="window.filtTodos('nome',this.value)" id="flt-nome-todos"/></div>
+  </div>
+  <div id="todos-info-agg" class="info" style="display:none">📊 Para este ano, apenas dados agregados estão disponíveis (totais mensais). Registros individuais estão disponíveis a partir de 2025.</div>
+  <div class="tcard"><div class="twrap"><table><thead id="t-todos-head"><tr><th>Paciente</th><th>Ano</th><th>Data</th><th>Procedimento</th><th>Pagamento</th><th>Valor</th><th>Parcelas</th></tr></thead><tbody id="t-todos"></tbody></table></div></div>
+</div>
+
+<!-- PARCELAMENTOS -->
+<div class="page" id="page-parc">
+  <div class="ph"><div><div class="ptitle">Controle de Parcelamentos</div><div class="psub">2025 + 2026 — créditos ativos</div></div></div>
+  <div class="g3" style="margin-bottom:14px">
+    <div class="met"><div class="ml">Total parcelado 2026</div><div class="mv" id="parc-tv26">—</div><div class="ms">12 parcelamentos Jan-Fev</div></div>
+    <div class="met"><div class="ml">Total parcelado 2025</div><div class="mv" id="parc-tv25">—</div><div class="ms">41 parcelamentos</div></div>
+    <div class="met amb"><div class="ml">A receber (combinado)</div><div class="mv" style="color:var(--blu)" id="parc-rv">—</div><div class="ms">parcelas pendentes</div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="ctitle">Projeção de recebíveis mensais — crédito parcelado</div>
+    <div class="leg"><div class="li"><div class="ls" style="background:#00A79D"></div>Recebido</div><div class="li"><div class="ls" style="background:rgba(0,167,157,.3)"></div>A receber</div></div>
+    <div style="position:relative;height:170px"><canvas id="cParcM"></canvas></div>
+  </div>
+  <div class="tcard">
+    <div style="padding:14px 18px 11px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bd)">
+      <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600">Parcelamentos ativos — 2025 e 2026</span>
+      <div class="sw"><span class="si">🔍</span><input class="srch" type="text" placeholder="Buscar..." oninput="window.filtParc(this.value)"/></div>
+    </div>
+    <div class="twrap"><table><thead><tr><th>Paciente</th><th>Ano</th><th>Data</th><th>Total</th><th>Mod.</th><th>Por mês</th><th>Progresso</th><th>%</th></tr></thead><tbody id="t-parc"></tbody></table></div>
+  </div>
+</div>
+
+<!-- BOLETOS -->
+<div class="page" id="page-bol">
+  <div class="ph"><div><div class="ptitle">Boletos e Contas a Pagar</div><div class="psub">Gestão de obrigações financeiras — 2026</div></div><button class="bp" onclick="window.toggleAddBol()">+ Novo boleto</button></div>
+  <div class="g3" style="margin-bottom:14px">
+    <div class="met red"><div class="ml">Total em aberto</div><div class="mv dn" id="bol-total">—</div><div class="ms" id="bol-ct">pendente + vencido</div></div>
+    <div class="met"><div class="ml">Saldo Fev/2026</div><div class="mv" id="bol-saldo">—</div><div class="ms">recebível − boleto</div></div>
+    <div class="met"><div class="ml">Próx. vencimento</div><div class="mv">15/Abr</div><div class="ms">Materiais Prick Test</div></div>
+  </div>
+  <div id="add-bol-area" style="display:none">
+    <div class="fs" style="margin-bottom:14px">
+      <div class="fh"><div class="fic">📋</div><div><div class="ftit">Cadastrar novo boleto</div><div class="fsub">Registre contas a pagar</div></div></div>
+      <div class="fg2">
+        <div class="fg full"><label>Descrição *</label><input type="text" id="b-desc" placeholder="Ex: Aluguel consultório"/></div>
+        <div class="fg"><label>Valor (R$) *</label><input type="number" id="b-val" step="0.01" placeholder="0,00"/></div>
+        <div class="fg"><label>Vencimento *</label><input type="date" id="b-venc"/></div>
+        <div class="fg"><label>Categoria</label><select id="b-cat"><option>Materiais/Insumos</option><option>Aluguel</option><option>Repasse laboratório</option><option>Equipamentos</option><option>Pessoal</option><option>Outros</option></select></div>
+        <div class="fg"><label>Status</label><select id="b-st"><option value="pend">Pendente</option><option value="pago">Pago</option><option value="venc">Vencido</option></select></div>
+      </div>
+      <div class="fa"><button class="bp" onclick="window.addBol()">✓ Salvar boleto</button><button class="bs" onclick="window.toggleAddBol()">Cancelar</button></div>
+      <div class="msg" id="b-msg"></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ctitle">Balanço mensal 2026</div><div style="position:relative;height:190px"><canvas id="cBol"></canvas></div></div>
+    <div class="card"><div class="ctitle">Resumo financeiro atual</div><div id="balanco-content"></div></div>
+  </div>
+  <div class="fbar" style="margin-bottom:12px">
+    <div class="sw"><span class="si">🔍</span><input class="srch" type="text" placeholder="Buscar boleto..." oninput="window.filtBol('busca',this.value)"/></div>
+    <select class="fsel" onchange="window.filtBol('status',this.value)"><option value="">Todos os status</option><option value="pend">Pendente</option><option value="pago">Pago</option><option value="venc">Vencido</option></select>
+    <select class="fsel" onchange="window.filtBol('ano',this.value)"><option value="">Todos os anos</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option></select>
+  </div>
+  <div id="bol-list"></div>
+</div>
+
+<!-- PROJEÇÃO 2026 -->
+<div class="page" id="page-proj">
+  <div class="ph"><div><div class="ptitle">Projeção 2026</div><div class="psub">Estimativa Mar–Dez 2026 baseada no histórico</div></div></div>
+  <div class="g2">
+    <div class="card"><div class="ctitle">Receita estimada — Mar a Dez 2026</div><div style="position:relative;height:210px"><canvas id="cProjR"></canvas></div></div>
+    <div class="card"><div class="ctitle">Comparativo Jan-Fev: 2024 · 2025 · 2026</div><div style="position:relative;height:210px"><canvas id="cProjComp"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">Projeção anual 2026 — detalhamento mensal</div>
+    <div class="twrap"><table><thead><tr><th>Mês</th><th>Status</th><th>Receita est.</th><th>Vs 2025 mesmo mês</th><th>Acumulado projetado</th></tr></thead><tbody id="t-proj"></tbody></table></div>
+  </div>
+</div>
+
+<!-- CONFIG -->
+<div class="page" id="page-conf">
+  <div class="ph"><div><div class="ptitle">Configurações</div><div class="psub">Personalize procedimentos e parâmetros</div></div></div>
+  <div class="save-tip">💾 <span><strong>Como acessar sempre:</strong> Salve este arquivo no computador (Ctrl+S / Cmd+S) — funciona offline. Os dados cadastrados ficam salvos automaticamente no navegador e aparecem toda vez que abrir este arquivo.</span></div>
+
+  <!-- Painel do banco local -->
+  <div class="db-box">
+    <div class="ctitle">Banco de dados local <span id="db-status-label" style="color:var(--grn);font-weight:500">Ativo</span></div>
+    <div class="db-stat"><span style="color:var(--t2)">Novos pacientes cadastrados</span><span style="font-weight:600;font-family:'Plus Jakarta Sans',sans-serif" id="db-pacs-ct">0</span></div>
+    <div class="db-stat"><span style="color:var(--t2)">Boletos adicionados</span><span style="font-weight:600;font-family:'Plus Jakarta Sans',sans-serif" id="db-bols-ct">0</span></div>
+    <div class="db-stat"><span style="color:var(--t2)">Último cadastro</span><span style="color:var(--t3);font-size:12px" id="db-last">—</span></div>
+    <div class="db-stat"><span style="color:var(--t2)">Espaço utilizado</span><span style="color:var(--t3);font-size:12px" id="db-size">—</span></div>
+    <div class="db-actions">
+      <button class="btn-export" onclick="window.exportarCSV()">⬇ Exportar novos cadastros (.csv)</button>
+      <button class="btn-export" onclick="window.exportarBoletos()">⬇ Exportar boletos (.csv)</button>
+      <button class="btn-danger" onclick="window.limparBanco()">🗑 Limpar banco local</button>
+    </div>
+    <div class="msg" id="db-msg"></div>
+  </div>
+  <div class="info">Alterações refletem imediatamente no formulário de cadastro. Sem necessidade de programador.</div>
+  <div class="g2">
+    <div class="card"><div class="ctitle">Tipos de procedimento</div><div id="chips-tipo" class="chips"></div><div class="car"><input type="text" id="new-tipo" placeholder="Novo procedimento..."/><button class="bp" onclick="window.addTipo()" style="padding:7px 12px;font-size:12px">Adicionar</button></div></div>
+    <div class="card"><div class="ctitle">Formas de pagamento</div><div id="chips-pgto" class="chips"></div><div class="car"><input type="text" id="new-pgto" placeholder="Nova forma de pagamento..."/><button class="bp" onclick="window.addPgto()" style="padding:7px 12px;font-size:12px">Adicionar</button></div></div>
+  </div>
+  <div class="card"><div class="ctitle">Sobre este sistema</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:13px;color:var(--t2)">
+      <div><strong style="color:var(--tx)">Clínica:</strong> Clivped Vacinas</div>
+      <div><strong style="color:var(--tx)">Especialidade:</strong> Alergologia — Dra. Fabiana</div>
+      <div><strong style="color:var(--tx)">Sede:</strong> Colatina, Espírito Santo</div>
+      <div><strong style="color:var(--tx)">Site:</strong> <a href="https://clivped.com.br" target="_blank" style="color:var(--cv)">www.clivped.com.br</a></div>
+      <div><strong style="color:var(--tx)">Dados carregados:</strong> 2019–2026 (planilha real)</div>
+      <div><strong style="color:var(--tx)">Total de registros:</strong> 976 atendimentos</div>
+    </div>
+  </div>
+</div>
+
+</div></div>
+
+<!-- Modal Editar Paciente -->
+<div class="modal-overlay" id="modal-edit-pac">
+  <div class="modal-box">
+    <div class="modal-title">Editar Paciente <button class="modal-close" onclick="window.fecharEditPac()">&times;</button></div>
+    <input type="hidden" id="ep-idx"/>
+    <div class="fg2">
+      <div class="fg full"><label>Nome</label><input id="ep-nome" type="text"/></div>
+      <div class="fg"><label>Data</label><input id="ep-data" type="date"/></div>
+      <div class="fg"><label>Valor (R$)</label><input id="ep-valor" type="number" step="0.01"/></div>
+      <div class="fg"><label>Procedimento</label><select id="ep-tipo" class="fsel" style="width:100%;padding:8px 11px"></select></div>
+      <div class="fg"><label>Pagamento</label><select id="ep-pgto" class="fsel" style="width:100%;padding:8px 11px"></select></div>
+    </div>
+    <div id="ep-msg" class="msg"></div>
+    <div class="modal-actions">
+      <button class="bs" onclick="window.fecharEditPac()">Cancelar</button>
+      <button class="bp" onclick="window.salvarEditPac()">Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+var PACS_2026 = [{"nome": "ISIS PEREIRA FADINI", "data": "05/01/2026", "dataISO": "2026-01-05", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "SOPHIE SILVA REIS", "data": "05/01/2026", "dataISO": "2026-01-05", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "JOAQUIM CAPPATO MONTEBELLER", "data": "06/01/2026", "dataISO": "2026-01-06", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "JULIA PESSIN GASPARINI", "data": "06/01/2026", "dataISO": "2026-01-06", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "EITHOR DAMIANI DE SOUZA", "data": "06/01/2026", "dataISO": "2026-01-06", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ANA CLARA LORETE SIEBERT", "data": "06/01/2026", "dataISO": "2026-01-06", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LIVIA TEIXEIRA AIRES DE SOUZA", "data": "07/01/2026", "dataISO": "2026-01-07", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ANA CLARA PIRES", "data": "08/01/2026", "dataISO": "2026-01-08", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "LORENZO CALDEIRA RONCHETI", "data": "09/01/2026", "dataISO": "2026-01-09", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ARTHUR ABREU GALDINO", "data": "09/01/2026", "dataISO": "2026-01-09", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LAURA DOS SANTOS PAULA", "data": "09/01/2026", "dataISO": "2026-01-09", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ARTHUR DE CARVALHO MOREIRA", "data": "09/01/2026", "dataISO": "2026-01-09", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "EDUARDO ZANOTELLI GUILIATE", "data": "10/01/2026", "dataISO": "2026-01-10", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "BERNARDO ULICK ZUCCOLOTTO", "data": "12/01/2026", "dataISO": "2026-01-12", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "GABRIEL DEGAN ZANETTI", "data": "13/01/2026", "dataISO": "2026-01-13", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LETICIA BASTOS MONTI", "data": "14/01/2026", "dataISO": "2026-01-14", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "HELENA GIURIATTO MARQUES", "data": "15/01/2026", "dataISO": "2026-01-15", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "MURILO FUNCO LEÃO", "data": "15/01/2026", "dataISO": "2026-01-15", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "PIETRA BAPTISTA BUDKOSWKY", "data": "15/01/2026", "dataISO": "2026-01-15", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "JOAO FRANCISCO OLIVEIRA MORELLA", "data": "15/01/2026", "dataISO": "2026-01-15", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ELOISA BRIDI GUISOLFI", "data": "15/01/2026", "dataISO": "2026-01-15", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "GUSTAVO MACHADO DE SOUZA", "data": "16/01/2026", "dataISO": "2026-01-16", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "NICOLAS DIAS ROCHA", "data": "16/01/2026", "dataISO": "2026-01-16", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "MIGUEL DELGADO", "data": "19/01/2026", "dataISO": "2026-01-19", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "PEDRO MARIANELLI", "data": "20/01/2026", "dataISO": "2026-01-20", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MILENA BASTOS DA SILVA", "data": "20/01/2026", "dataISO": "2026-01-20", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "BENTO DE ASSIS VIEIRA", "data": "21/01/2026", "dataISO": "2026-01-21", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MAITE DA SILVA KOFFLER", "data": "23/01/2026", "dataISO": "2026-01-23", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "MIGUEL ROSA PAIER", "data": "24/01/2026", "dataISO": "2026-01-24", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 360.0, "n": 1, "pago": 0}, {"nome": "HELOISA KRUGER CABRAL", "data": "26/01/2026", "dataISO": "2026-01-26", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ANA BEATRIZ QUEIROZ POLA", "data": "26/01/2026", "dataISO": "2026-01-26", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "BENJAMIN DUARTE SANTANA DOS REIS", "data": "26/01/2026", "dataISO": "2026-01-26", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MATEUS IMBERT JOSE", "data": "27/01/2026", "dataISO": "2026-01-27", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "BENJAMIN DULÇO BAYER", "data": "27/01/2026", "dataISO": "2026-01-27", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MURILO PETRI ROMANO", "data": "27/01/2026", "dataISO": "2026-01-27", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "VALENTINA DE JESUS SOLEIRO", "data": "28/01/2026", "dataISO": "2026-01-28", "ano": 2026, "mes": 1, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "LORENZO CALDEIRA RONCHETI", "data": "28/01/2026", "dataISO": "2026-01-28", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "SOFIA GOMES DE SOUZA", "data": "28/01/2026", "dataISO": "2026-01-28", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "HELENA MORAU SCARDUA", "data": "29/10/2026", "dataISO": "2026-10-29", "ano": 2026, "mes": 10, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "LORENZO DOS SANTOS RODRIGUES", "data": "29/10/2026", "dataISO": "2026-10-29", "ano": 2026, "mes": 10, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "HEBROM E QUIRIATE VILAÇA BATISTA", "data": "30/01/2026", "dataISO": "2026-01-30", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 1800.0, "n": 1, "pago": 0}, {"nome": "GABRIELI DIAS GOESI", "data": "30/01/2026", "dataISO": "2026-01-30", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "EDUARDA E ENZO  BATISTA CORTELETTI", "data": "31/01/2026", "dataISO": "2026-01-31", "ano": 2026, "mes": 1, "tipo": "MULTITEST", "pgto": "DEB", "valor": 500.0, "n": 1, "pago": 0}, {"nome": "MANUELA MACIEL DOS SANTOS", "data": "31/01/2026", "dataISO": "2026-01-31", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "BENICIO E ANA CLARA (2 CONSULTAS)", "data": "29/01/2026", "dataISO": "2026-01-29", "ano": 2026, "mes": 1, "tipo": "MULTITEST", "pgto": "CRED 1X", "valor": 1100.0, "n": 1, "pago": 0}, {"nome": "HENRICO MENEZES FRIZZERA", "data": "02/02/2026", "dataISO": "2026-02-02", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "HELENA FERREIRA SCARDUA (CONSULTA)", "data": "02/02/2026", "dataISO": "2026-02-02", "ano": 2026, "mes": 2, "tipo": "MULTITEST", "pgto": "DEB", "valor": 550.0, "n": 1, "pago": 0}, {"nome": "MURILO MIELKE BORTOLINI VERNEQUE", "data": "02/02/2026", "dataISO": "2026-02-02", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "NICOLAS BURINI MARCOS", "data": "02/02/2026", "dataISO": "2026-02-02", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DEB", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "GAEL CORTELLETTI VENTURINI", "data": "02/02/2026", "dataISO": "2026-02-02", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "NILTON FREIRE SAMPAIO NETO", "data": "02/02/2026", "dataISO": "2026-02-02", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "CRED 1X", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ANTONIO CALIMAN FALQUETO", "data": "03/02/2026", "dataISO": "2026-02-03", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "RAYAN BRANDEMBURG CARVALHO", "data": "04/02/2026", "dataISO": "2026-02-04", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "SOPHIE SILVA REIS", "data": "05/02/2026", "dataISO": "2026-02-05", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ANTONIO ARAUJO MARTINS", "data": "05/02/2026", "dataISO": "2026-02-05", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "FELIPE GAROZI ZANETTI", "data": "05/02/2026", "dataISO": "2026-02-05", "ano": 2026, "mes": 2, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 270.0, "n": 1, "pago": 0}, {"nome": "MAYA ZOVICO RIBEIRO", "data": "05/02/2026", "dataISO": "2026-02-05", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 470.0, "n": 1, "pago": 0}, {"nome": "LUISA COSLOP COMERIO", "data": "05/02/2026", "dataISO": "2026-02-05", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "CRED 1X", "valor": 470.0, "n": 1, "pago": 0}, {"nome": "HELENA E PEDRO FIDELES VASCONCELOS", "data": "06/02/2026", "dataISO": "2026-02-06", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 900.0, "n": 1, "pago": 0}, {"nome": "ISIS PEREIRA FADINI", "data": "07/02/2026", "dataISO": "2026-02-07", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "JOAO GUIILHERME CONTI KNAAK", "data": "09/02/2026", "dataISO": "2026-02-09", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "LAURA DOS SANTOS PAULA", "data": "09/02/2026", "dataISO": "2026-02-09", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "JULIA LAUERS BERGAMI", "data": "10/02/2026", "dataISO": "2026-02-10", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "JULIA PESSIM GASPARINI", "data": "10/02/2026", "dataISO": "2026-02-10", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "EDUARDA BRAUM MARIN", "data": "10/02/2026", "dataISO": "2026-02-10", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "PEDRO SIMONASSI VIERIA", "data": "10/02/2026", "dataISO": "2026-02-10", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "DANIEL BAUTZ NEITZEL", "data": "10/02/2026", "dataISO": "2026-02-10", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "EDUARDO ZANOTELLI GUILIATTE", "data": "10/02/2026", "dataISO": "2026-02-10", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "LETICIA BASTOS MONTI", "data": "10/02/2026", "dataISO": "2026-02-10", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "THAYRON GILBERTO ZARDO", "data": "11/02/2026", "dataISO": "2026-02-11", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ISADORA ANDREATTA MARQUES", "data": "11/02/2026", "dataISO": "2026-02-11", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE EUZEBIO DA VITORIA", "data": "11/02/2026", "dataISO": "2026-02-11", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "MANUELLA COELHO DE SOUZA", "data": "11/02/2026", "dataISO": "2026-02-11", "ano": 2026, "mes": 2, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "GABREL DEGAN ZANETTI", "data": "11/02/2026", "dataISO": "2026-02-11", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DEB", "valor": 500.0, "n": 1, "pago": 0}, {"nome": "GABREL DEGAN ZANETTI  (CONSULTA)", "data": "11/02/2026", "dataISO": "2026-02-11", "ano": 2026, "mes": 2, "tipo": "MULTITEST", "pgto": "DEB", "valor": 550.0, "n": 1, "pago": 0}, {"nome": "IAGO GAROZI COSTA", "data": "12/02/2026", "dataISO": "2026-02-12", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "JOAO PEDRO VIEIRA POLEZ", "data": "12/02/2026", "dataISO": "2026-02-12", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 400.0, "n": 2, "pago": 0}, {"nome": "JOAO PEDRO VIEIRA POLEZ", "data": "12/02/2026", "dataISO": "2026-02-12", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 100.0, "n": 1, "pago": 0}, {"nome": "ESTHER ARAUJO COQUITO", "data": "12/02/2026", "dataISO": "2026-02-12", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "MAITE DA SILVA KOFFLER", "data": "23/02/2026", "dataISO": "2026-02-23", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "MGUEL DELGADO", "data": "23/02/2026", "dataISO": "2026-02-23", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ARTHUR DE CARVALHO MOREIRA", "data": "23/02/2026", "dataISO": "2026-02-23", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "NICOLAS DIAS ROCHA", "data": "23/02/2026", "dataISO": "2026-02-23", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "GUSTAVO MACHADO DE SOUZA", "data": "23/02/2026", "dataISO": "2026-02-23", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ISIS LUCHI", "data": "23/02/2026", "dataISO": "2026-02-23", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "PEDRO MARIANELLI", "data": "24/02/2026", "dataISO": "2026-02-24", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "VALENTINA MAROQUE NICOLE", "data": "24/02/2026", "dataISO": "2026-02-24", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "BERNARDO AGUIAR SIERAT", "data": "25/02/2026", "dataISO": "2026-02-25", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "PETRUS JASKE GUIMIERO", "data": "25/02/2026", "dataISO": "2026-02-25", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 900.0, "n": 1, "pago": 0}, {"nome": "VCTORIA PINA STELZER DE OLIVEIRA", "data": "25/02/2026", "dataISO": "2026-02-25", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 900.0, "n": 1, "pago": 0}, {"nome": "ARTHUR DE SOUZA BARBOSA", "data": "25/02/2026", "dataISO": "2026-02-25", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 900.0, "n": 1, "pago": 0}, {"nome": "ANA CLARA PIRES DANTAS ALVES", "data": "25/02/2026", "dataISO": "2026-02-25", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "BRAYAN GARCIA DA ROCHA", "data": "25/02/2026", "dataISO": "2026-02-25", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "GUSTAVO ANDRADE LIMA", "data": "26/02/2026", "dataISO": "2026-02-26", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 500.0, "n": 2, "pago": 0}, {"nome": "GUSTAVO ANDRADE LIMA", "data": "26/02/2026", "dataISO": "2026-02-26", "ano": 2026, "mes": 2, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 270.0, "n": 1, "pago": 0}, {"nome": "HELENA MORAU SCARDUA", "data": "26/02/2026", "dataISO": "2026-02-26", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ANA CLARA PIMENTA CELANTE MAURO", "data": "26/02/2026", "dataISO": "2026-02-26", "ano": 2026, "mes": 2, "tipo": "MULTITEST", "pgto": "CRED 1X", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "ARTHUR ABREU GALDINO", "data": "26/02/2026", "dataISO": "2026-02-26", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 500.0, "n": 2, "pago": 0}, {"nome": "VALENTINA KNAAK DE SOUZA", "data": "27/02/2026", "dataISO": "2026-02-27", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "LUISA E LAVINIA PINAFFO PEREIRA", "data": "27/02/2026", "dataISO": "2026-02-27", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 900.0, "n": 1, "pago": 0}, {"nome": "MURILO PETRI ROMANO", "data": "27/02/2026", "dataISO": "2026-02-27", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DEB", "valor": 500.0, "n": 1, "pago": 0}, {"nome": "BENJAMIN DUARTE SANTANA DOS REIS", "data": "27/02/2026", "dataISO": "2026-02-27", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "MANUELA MACIEL DOS SANTOS", "data": "28/02/2026", "dataISO": "2026-02-28", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}];
+var PACS_2025 = [{"nome": "HEITOR ZAMBOM HEMERLY", "data": "02/02/2025", "dataISO": "2025-02-02", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE COFFLER MONTEBELLER", "data": "01/07/2025", "dataISO": "2025-07-01", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ANTONIO ZAMBOM HEMERLY", "data": "02/02/2025", "dataISO": "2025-02-02", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "HENRY BENEVIDES WOLTICHOSKI", "data": "01/07/2025", "dataISO": "2025-07-01", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "RYAN DA SILVA FAGUNDES", "data": "03/01/2025", "dataISO": "2025-01-03", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "JOA MIGUEL MOURA PESTANA", "data": "01/07/2025", "dataISO": "2025-07-01", "ano": 2025, "mes": 7, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 250.0, "n": 1, "pago": 0}, {"nome": "EITHOR DAMIANI DE SOUZA", "data": "06/01/2025", "dataISO": "2025-01-06", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "HELOISA KRUGER CABRAL", "data": "01/07/2025", "dataISO": "2025-07-01", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "MELISSA DRAGO (PATCH)", "data": "06/01/2025", "dataISO": "2025-01-06", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "MARDOQUEO OLIVEIRA ELIZEU", "data": "01/07/2025", "dataISO": "2025-07-01", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ELVIRA BONNA", "data": "06/01/2025", "dataISO": "2025-01-06", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "GABRIEL DEGAN ZANETTI", "data": "02/07/2025", "dataISO": "2025-07-02", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DEB", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "HENRICO MENEZES FRIZZERA", "data": "07/01/2025", "dataISO": "2025-01-07", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "EMILY LUCINDO", "data": "02/07/2025", "dataISO": "2025-07-02", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ARTHUR ABREU GALDINO", "data": "07/01/2025", "dataISO": "2025-01-07", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "MILENA BASTOS SILVA", "data": "02/07/2025", "dataISO": "2025-07-02", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DEB", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "VICTORIA PINA STELZER DE OLIVEIRA", "data": "07/01/2025", "dataISO": "2025-01-07", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ANA CLARA LORETE SIEBERT", "data": "08/01/2025", "dataISO": "2025-01-08", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "THAYRON GILBERTO ZARDO", "data": "02/07/2025", "dataISO": "2025-07-02", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE SANTOS MANZOLI", "data": "09/01/2025", "dataISO": "2025-01-09", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "JOAO LUCAS CAPUCHO NIERO DA COSTA", "data": "02/07/2025", "dataISO": "2025-07-02", "ano": 2025, "mes": 7, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "BERNARDO ULICK ZUCCOLOTTO", "data": "09/01/2025", "dataISO": "2025-01-09", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "NICOLAS DIAS ROCHA", "data": "02/07/2025", "dataISO": "2025-07-02", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "SOFIA GOMES DE SOUZA", "data": "13/01/2025", "dataISO": "2025-01-13", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MIGUEL ROSA PAIER", "data": "03/07/2025", "dataISO": "2025-07-03", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LETICIA BASTOS MONTE", "data": "13/01/2025", "dataISO": "2025-01-13", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "MURILO PETRI ROMANO", "data": "03/07/2025", "dataISO": "2025-07-03", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "HELENA GARCIA VELTEN", "data": "13/01/2025", "dataISO": "2025-01-13", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 790.0, "n": 1, "pago": 0}, {"nome": "ARTHUR ABREU GALDINO", "data": "04/07/2025", "dataISO": "2025-07-04", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "MURILO FINCO LEÃO", "data": "14/01/2025", "dataISO": "2025-01-14", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "BERNARDO AGUIAR SIERAT", "data": "04/07/2025", "dataISO": "2025-07-04", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ARTHUR DE SOUZA BARBOSA", "data": "14/01/2025", "dataISO": "2025-01-14", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "MAITE DA SILVA KOFFLER", "data": "07/07/2025", "dataISO": "2025-07-07", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ANTONIO CALIMAN FALQUETO", "data": "16/01/2025", "dataISO": "2025-01-16", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "BERNARDO ULICK ZUCCOLOTTO", "data": "07/07/2025", "dataISO": "2025-07-07", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "RAYAN BRADEMBURG CARVALHO", "data": "16/01/2025", "dataISO": "2025-01-16", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ANA BEATRIZ QUEIROZ POLA", "data": "07/07/2025", "dataISO": "2025-07-07", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MARIA VITORIA SPALENZA DA COSTA", "data": "16/01/2025", "dataISO": "2025-01-16", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "LUISA OLIVEIRA E GABRIEL DEGAN (CONSULTA)", "data": "02/07/2025", "dataISO": "2025-07-02", "ano": 2025, "mes": 7, "tipo": "MULTITEST", "pgto": "DEB", "valor": 900.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE EUZEBIO DA VITORIA", "data": "17/01/2025", "dataISO": "2025-01-17", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 790.0, "n": 1, "pago": 0}, {"nome": "VIRGINIA MOKEL", "data": "03/07/2025", "dataISO": "2025-07-03", "ano": 2025, "mes": 7, "tipo": "MULTITEST", "pgto": "DEB", "valor": 190.0, "n": 1, "pago": 0}, {"nome": "RIANDRE CORREIA MENEGARDO", "data": "18/01/2025", "dataISO": "2025-01-18", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 790.0, "n": 1, "pago": 0}, {"nome": "JULIA ZANETTI SOTELLE (LASER)", "data": "18/01/2025", "dataISO": "2025-01-18", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 170.0, "n": 1, "pago": 0}, {"nome": "HENRICO MENEZES FRIZZERA", "data": "08/07/2025", "dataISO": "2025-07-08", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "GABRIELI DIAS GOESI", "data": "20/01/2025", "dataISO": "2025-01-20", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "HENRIQUE KLEMZ", "data": "09/07/2025", "dataISO": "2025-07-09", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "IAN LOOSE DUBBERSTEIN", "data": "20/01/2025", "dataISO": "2025-01-20", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "LUCCA CORTELETI VENTURINI", "data": "09/07/2025", "dataISO": "2025-07-09", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "LAURA HERZOG OLIVEIRA (CONSULTA)", "data": "20/01/2025", "dataISO": "2025-01-20", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "CRED 1X", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ELOISA BRIDI GHISOLFI", "data": "09/07/2025", "dataISO": "2025-07-09", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LORENZO DOS SANTOS RODRIGUES", "data": "20/01/2025", "dataISO": "2025-01-20", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "THEO MACEDO FREITAS", "data": "09/07/2025", "dataISO": "2025-07-09", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "EMILY LUCINDO", "data": "22/01/2025", "dataISO": "2025-01-22", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ANTONELLA NOBRE", "data": "09/07/2025", "dataISO": "2025-07-09", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 1X", "valor": 490.0, "n": 1, "pago": 0}, {"nome": "ANTONIO VIDOTTO DA VITORIA (CONSULTA + PRICK)", "data": "22/01/2025", "dataISO": "2025-01-22", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "DEB", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "THEO HENRIQUE EGERT (CONSULTA)", "data": "22/01/2025", "dataISO": "2025-01-22", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "DEB", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "PATRICK PEREIRA SCANDIAN (PRICK)", "data": "23/01/2025", "dataISO": "2025-01-23", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "LUIZA DA SILVA (CONSULTA)", "data": "23/01/2025", "dataISO": "2025-01-23", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 440.0, "n": 2, "pago": 0}, {"nome": "ANTONIO ARAUJO MARTINS", "data": "10/07/2025", "dataISO": "2025-07-10", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "HELOISA SILVA RIBEIRO (PRICK)", "data": "27/01/2025", "dataISO": "2025-01-27", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 320.0, "n": 1, "pago": 0}, {"nome": "MATHEUS IMBERTI JOSE", "data": "11/07/2025", "dataISO": "2025-07-11", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "INACIO LOYTERIO FARDIN", "data": "27/01/2025", "dataISO": "2025-01-27", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "FRANCISCO COSTA BADIANI BORTOLO", "data": "11/07/2025", "dataISO": "2025-07-11", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 1680.0, "n": 1, "pago": 0}, {"nome": "PEDRO DA SILVA", "data": "27/01/2025", "dataISO": "2025-01-27", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ARTHUR DE CARVALHO MOREIRA", "data": "11/07/2025", "dataISO": "2025-07-11", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE COSME TOZI", "data": "28/01/2025", "dataISO": "2025-01-28", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "BERNARDO OLIVEIRA PESSOA", "data": "28/01/2025", "dataISO": "2025-01-28", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JOAO LUCAS CAPUCHO NIERO DA COSTA", "data": "11/07/2025", "dataISO": "2025-07-11", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "GABRIEL BERNARDO FERREIRA KNAAK (PRICK)", "data": "28/01/2025", "dataISO": "2025-01-28", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 320.0, "n": 1, "pago": 0}, {"nome": "ARTHUR AGOSTINI GASPARINI (CONSULTA)", "data": "29/01/2025", "dataISO": "2025-01-29", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ANA CLARA PINAFFO", "data": "14/07/2025", "dataISO": "2025-07-14", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 6X", "valor": 450.0, "n": 6, "pago": 0}, {"nome": "MATHEUS IMBERTI JOSE", "data": "29/01/2025", "dataISO": "2025-01-29", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "VALENTINA KNAAK DE SOUZA", "data": "15/07/2025", "dataISO": "2025-07-15", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 790.0, "n": 1, "pago": 0}, {"nome": "GAEL CORTELETTI VENTURINI (LASER)", "data": "30/01/2025", "dataISO": "2025-01-30", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "CRED 1X", "valor": 170.0, "n": 1, "pago": 0}, {"nome": "GABRIEL FERNANDES RIZZI", "data": "30/01/2025", "dataISO": "2025-01-30", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "CRED 4X", "valor": 900.0, "n": 4, "pago": 0}, {"nome": "SOFIA GOMES DE SOUZA", "data": "16/07/2025", "dataISO": "2025-07-16", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 670.0, "n": 2, "pago": 0}, {"nome": "ESTHER ROSSATO GOMES (PRICK)", "data": "30/01/2025", "dataISO": "2025-01-30", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "HELENA CARDOSO ALMEIDA / LUISA OLIVEIRA HORTA", "data": "16/07/2025", "dataISO": "2025-07-16", "ano": 2025, "mes": 7, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 700.0, "n": 1, "pago": 0}, {"nome": "HEITOR ZAMBOM HEMERLY", "data": "16/07/2025", "dataISO": "2025-07-16", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "JULIA LAUERS BERGAMI", "data": "16/07/2025", "dataISO": "2025-07-16", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "HELOA TAQUETI SILVA PINHEIRO", "data": "16/07/2025", "dataISO": "2025-07-16", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "HELENA E CECILIA GIURIATTO MARQUES", "data": "16/07/2025", "dataISO": "2025-07-16", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 770.0, "n": 2, "pago": 0}, {"nome": "ANTONIO CALIMAN FALQUETO", "data": "18/07/2025", "dataISO": "2025-07-18", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "JOAO FRANCISCO OLIVERA MORELLA | NILTON FREIRE NETO", "data": "21/07/2025", "dataISO": "2025-07-21", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 900.0, "n": 2, "pago": 0}, {"nome": "PIETRA BAPTISTA BUDKOSWKY", "data": "23/07/2025", "dataISO": "2025-07-23", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ISIS PEREIRA FADINI", "data": "24/07/2025", "dataISO": "2025-07-24", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 840.0, "n": 1, "pago": 0}, {"nome": "LETICIA BASTOS MONTI", "data": "24/07/2025", "dataISO": "2025-07-24", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ISADORA LODI GRAMELICH", "data": "28/07/2025", "dataISO": "2025-07-28", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "IAGO GAROZI COSTA |", "data": "28/07/2025", "dataISO": "2025-07-28", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "JOAQUIM CAPATTO MONTEBELLER", "data": "03/02/2025", "dataISO": "2025-02-03", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 1X", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ANTONIO ZAMBON HEMERLY", "data": "01/08/2025", "dataISO": "2025-08-01", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "BERNARDO NATALI CASSARO", "data": "04/02/2025", "dataISO": "2025-02-04", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 840.0, "n": 1, "pago": 0}, {"nome": "LORENZO DOS SANTOS RODRIGUES", "data": "01/08/2025", "dataISO": "2025-08-01", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MURILO PETRO ROMANO", "data": "04/02/2025", "dataISO": "2025-02-04", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 840.0, "n": 1, "pago": 0}, {"nome": "ILANA MARIA ANDRADE PREATO", "data": "01/08/2025", "dataISO": "2025-08-01", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "MILENA BASTOS DA SILVA", "data": "05/02/2025", "dataISO": "2025-02-05", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DEB", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "THAYRON GILBERTO ZARDO", "data": "01/08/2025", "dataISO": "2025-08-01", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 840.0, "n": 1, "pago": 0}, {"nome": "REBEKA TEZNER HIANC (PATCH)", "data": "05/02/2025", "dataISO": "2025-02-05", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 480.0, "n": 1, "pago": 0}, {"nome": "MARIANA FORNACIARI SILVA", "data": "01/08/2025", "dataISO": "2025-08-01", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "VICTORIA PINA STELZER DE OLIVEIRA", "data": "05/02/2025", "dataISO": "2025-02-05", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "BIANCA GIMENEZ", "data": "01/08/2025", "dataISO": "2025-08-01", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "BERNARDO ULICK ZUCOLOTTO", "data": "06/02/2025", "dataISO": "2025-02-06", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "RUAN LUCCA MUNIZ KAMPINE", "data": "01/08/2025", "dataISO": "2025-08-01", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 350.0, "n": 2, "pago": 0}, {"nome": "RYAN DA SILVA FAGUNDES", "data": "07/02/2025", "dataISO": "2025-02-07", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "NOAH GASTALDI RODRIGUES", "data": "04/08/2025", "dataISO": "2025-08-04", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 260.0, "n": 1, "pago": 0}, {"nome": "ARTHUR ABREU GALDINO", "data": "07/02/2025", "dataISO": "2025-02-07", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ELISA CONTARATO MACHADO", "data": "04/08/2025", "dataISO": "2025-08-04", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 1X", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ANTONIO ZANI VULPI (LASER)", "data": "07/02/2025", "dataISO": "2025-02-07", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 170.0, "n": 1, "pago": 0}, {"nome": "JULIA PESSIM GASPARINI", "data": "02/08/2025", "dataISO": "2025-08-02", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 6X", "valor": 900.0, "n": 6, "pago": 0}, {"nome": "MAITE DA SILVA KOFFLER", "data": "08/02/2025", "dataISO": "2025-02-08", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "TIAGO MOGNATO", "data": "05/08/2025", "dataISO": "2025-08-05", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "OTAVIO NDRADE GARCIA VIERIA REIS (PRICK)", "data": "10/02/2025", "dataISO": "2025-02-10", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 320.0, "n": 1, "pago": 0}, {"nome": "LETICIA BASTOS MONTI", "data": "10/02/2025", "dataISO": "2025-02-10", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LARA PARANHO ALTOE", "data": "05/08/2025", "dataISO": "2025-08-05", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 270.0, "n": 1, "pago": 0}, {"nome": "SOFIA GOMES DE SOUZA", "data": "11/02/2025", "dataISO": "2025-02-11", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ARTHUR ABREU GALDINO", "data": "05/08/2025", "dataISO": "2025-08-05", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "LUISA HORTA CASTRO", "data": "12/02/2025", "dataISO": "2025-02-12", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "MURILO MIELKE BORTOLINI VERNEQUE", "data": "05/08/2025", "dataISO": "2025-08-05", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ARTHUR AGOSTINI GASPARINI (PRICK)", "data": "12/02/2025", "dataISO": "2025-02-12", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "CRED 1X", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "VICTORIA PINA STELZER DE OLIVEIRA", "data": "05/08/2025", "dataISO": "2025-08-05", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "RAFAEL ALVES OLIVEIRA (PRICK)", "data": "13/02/2025", "dataISO": "2025-02-13", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "DEB", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "YASMIN CALIXTO XAVIER", "data": "05/08/2025", "dataISO": "2025-08-05", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 840.0, "n": 1, "pago": 0}, {"nome": "ALICE GALÃO", "data": "13/02/2025", "dataISO": "2025-02-13", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "OTAVIO ANDRADE GARCIA VIEIRA REIS", "data": "05/08/2025", "dataISO": "2025-08-05", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LUISA COSLOP COMERIO", "data": "13/02/2025", "dataISO": "2025-02-13", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 1X", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "NICOLAS DIAS ROCHA", "data": "06/08/2025", "dataISO": "2025-08-06", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "DANIEL BAUTZ NEITIZEL", "data": "14/02/2025", "dataISO": "2025-02-14", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "GABRIEL GUARIZI STREPEZA", "data": "06/08/2025", "dataISO": "2025-08-06", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE SANTOS MANZOLI", "data": "14/02/2025", "dataISO": "2025-02-14", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ALICE TECHES RUTSATZ", "data": "06/08/2025", "dataISO": "2025-08-06", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "DANIEL GODIN DIAS (TPO)", "data": "14/02/2025", "dataISO": "2025-02-14", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "CRED 3X", "valor": 1780.0, "n": 3, "pago": 0}, {"nome": "GABRIEL DEGAN ZANETTI", "data": "06/08/2025", "dataISO": "2025-08-06", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DEB", "valor": 550.0, "n": 1, "pago": 0}, {"nome": "INACIO LOTÉRIO", "data": "14/02/2025", "dataISO": "2025-02-14", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 3X", "valor": 900.0, "n": 3, "pago": 0}, {"nome": "HENRIQUE KLEMZ", "data": "06/08/2025", "dataISO": "2025-08-06", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ISADORA LODI GRAMELICH", "data": "15/02/2025", "dataISO": "2025-02-15", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "BERNARDO ULIK ZUCCOLOTTO", "data": "07/08/2025", "dataISO": "2025-08-07", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ANTONIO ARAÚJO MARTINS", "data": "15/02/2025", "dataISO": "2025-02-15", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MARIA VALENTINA PIERAZZO MORAU", "data": "07/08/2025", "dataISO": "2025-08-07", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ENZO FERREIRA DE OLIVEIRA CESAR (PRICK)", "data": "17/02/2025", "dataISO": "2025-02-17", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 350.0, "n": 2, "pago": 0}, {"nome": "MILENA BASTOS DA SILVA", "data": "07/08/2025", "dataISO": "2025-08-07", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DEB", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE KLEMZ (PRICK)", "data": "18/02/2025", "dataISO": "2025-02-18", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 320.0, "n": 1, "pago": 0}, {"nome": "ESTER ENGEHARDT ALMEIDA", "data": "08/08/2025", "dataISO": "2025-08-08", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "PEDRO FILDELIS VASCONCELOS (PRICK)", "data": "19/02/2025", "dataISO": "2025-02-19", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 320.0, "n": 1, "pago": 0}, {"nome": "VALENTINA SILVA DE PAULA", "data": "08/08/2025", "dataISO": "2025-08-08", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 250.0, "n": 1, "pago": 0}, {"nome": "HELENA FIDELIS VASCONCELOS (PRICK)", "data": "19/02/2025", "dataISO": "2025-02-19", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 320.0, "n": 1, "pago": 0}, {"nome": "LUISA ANDREATTA SOARES", "data": "08/08/2025", "dataISO": "2025-08-08", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 260.0, "n": 1, "pago": 0}, {"nome": "JULIA LAUERS BERGAMI", "data": "19/02/2025", "dataISO": "2025-02-19", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "BERNARDO OLIVEIRA PESSOA", "data": "08/08/2025", "dataISO": "2025-08-08", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MURILO FINCO LEAO", "data": "19/02/2025", "dataISO": "2025-02-19", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 785.0, "n": 1, "pago": 0}, {"nome": "ANTNO ARAUJO MARTINS", "data": "09/08/2025", "dataISO": "2025-08-09", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MIGUEL FERREIRA ALBANI", "data": "20/02/2025", "dataISO": "2025-02-20", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ANNA BEATRIZ CAMPOS FROCHILICH", "data": "11/08/2025", "dataISO": "2025-08-11", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 270.0, "n": 1, "pago": 0}, {"nome": "RAFAEL ALVES DE OLIVEIRA (PRICK)", "data": "20/02/2025", "dataISO": "2025-02-20", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "DEB", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "ARTHUR DE CARVALHO MOREIRA", "data": "11/08/2025", "dataISO": "2025-08-11", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ARTHUR DE CARVALHO MOREIRA", "data": "20/02/2025", "dataISO": "2025-02-20", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "DANIEL BAUTZ NEITZEL", "data": "12/08/2025", "dataISO": "2025-08-12", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "MIGUEL DELGADO", "data": "20/02/2025", "dataISO": "2025-02-20", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ALICIA FERREIRA PERIN", "data": "12/08/2025", "dataISO": "2025-08-12", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 270.0, "n": 1, "pago": 0}, {"nome": "EDUARDA COLODETTI SCHERERER (PRICK)", "data": "20/02/2025", "dataISO": "2025-02-20", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 320.0, "n": 1, "pago": 0}, {"nome": "BERNARDO AGUIAR SIERAT", "data": "12/08/2025", "dataISO": "2025-08-12", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "HENRICO MENEZES FRIZZERA", "data": "20/02/2025", "dataISO": "2025-02-20", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LUISA HORTA CASTRO", "data": "12/08/2025", "dataISO": "2025-08-12", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 1X", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "HELENA FIDELIS VASCONCELOS (PRICK)", "data": "21/02/2025", "dataISO": "2025-02-21", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 1680.0, "n": 1, "pago": 0}, {"nome": "LUIZA RIZZO FAVARATO", "data": "12/08/2025", "dataISO": "2025-08-12", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 320.0, "n": 1, "pago": 0}, {"nome": "HELENA GUIRIATTO MARQUES", "data": "21/02/2025", "dataISO": "2025-02-21", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "MIGUEL DELGADO", "data": "14/08/2025", "dataISO": "2025-08-14", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ANTONIO ZAMBOM HEMERLY", "data": "22/02/2025", "dataISO": "2025-02-22", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "HELENA BARRETO GUERINI", "data": "14/08/2025", "dataISO": "2025-08-14", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "HEITOR ZAMBOM HEMERLY", "data": "22/02/2025", "dataISO": "2025-02-22", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "HENRIWQUE EUZEBIO DA VITORIA", "data": "18/08/2025", "dataISO": "2025-08-18", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "DAVI AMANCO SERAFIM (PRICK)", "data": "25/02/2025", "dataISO": "2025-02-25", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "OLAVO MARTINS ALEXANDRINO E ANDRE LACERDA", "data": "18/08/2025", "dataISO": "2025-08-18", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 520.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE EUZEBIO DA VITORIA", "data": "25/02/2025", "dataISO": "2025-02-25", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 1185.0, "n": 1, "pago": 0}, {"nome": "JOSE AUGUSTO POLEZI PIRES DA LUZ", "data": "19/08/2025", "dataISO": "2025-08-19", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 260.0, "n": 1, "pago": 0}, {"nome": "JOAO FRANCISCO OLIVEIRA MORELLA", "data": "25/02/2025", "dataISO": "2025-02-25", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MURILO FINCO LEAO", "data": "20/08/2025", "dataISO": "2025-08-20", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ALICE ALVES TEIXEIRA (PRICK)", "data": "25/02/2025", "dataISO": "2025-02-25", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 350.0, "n": 2, "pago": 0}, {"nome": "GABRIEL DIAS GOESE", "data": "20/08/2025", "dataISO": "2025-08-20", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "EMILY LUCINDO", "data": "26/02/2025", "dataISO": "2025-02-26", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "EMIR UBALDO RIZO NETO", "data": "20/08/2025", "dataISO": "2025-08-20", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "IAGO GAROZI COSTA", "data": "26/02/2025", "dataISO": "2025-02-26", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "VICENTE MARQUES FERREIRA", "data": "20/08/2025", "dataISO": "2025-08-20", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "JHULIA ZANETTE", "data": "27/02/2025", "dataISO": "2025-02-27", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JHULIA ZANETTE", "data": "21/08/2025", "dataISO": "2025-08-21", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ANA BEATRIZ QUEIROZ POLA", "data": "27/02/2025", "dataISO": "2025-02-27", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "SOFIA GOMES DE SOUZA", "data": "21/08/2025", "dataISO": "2025-08-21", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ANA CLARA LORETE SIEBERT", "data": "28/02/2025", "dataISO": "2025-02-28", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "RUAN LUCCA MUNIZ KAMPINE", "data": "21/08/2025", "dataISO": "2025-08-21", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 2X", "valor": 900.0, "n": 2, "pago": 0}, {"nome": "EITHOR DAMIANI DE SOUZA", "data": "28/02/2025", "dataISO": "2025-02-28", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MARDOQUEO OLIVEIRA ELIZEU", "data": "21/08/2025", "dataISO": "2025-08-21", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 790.0, "n": 1, "pago": 0}, {"nome": "ANA BEATIZ QUEIROZ POLA", "data": "25/08/2025", "dataISO": "2025-08-25", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "LETICIA BASTOS MONTI", "data": "25/08/2025", "dataISO": "2025-08-25", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ELISA CONTARATO MACHADO", "data": "25/08/2025", "dataISO": "2025-08-25", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 1X", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "OLAVO MARTINS ALEXANDRINO E ANDRE LACERDA", "data": "25/08/2025", "dataISO": "2025-08-25", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "JOAO FRANCISCO OLIVEIRA MORELLA", "data": "25/08/2025", "dataISO": "2025-08-25", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ALICE CASSANI", "data": "25/08/2025", "dataISO": "2025-08-25", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 250.0, "n": 1, "pago": 0}, {"nome": "NILTON FREIRE SAMPAIO NETO", "data": "25/08/2025", "dataISO": "2025-08-25", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 1X", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "SAMUEL PAIER MARCOS", "data": "25/08/2025", "dataISO": "2025-08-25", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 250.0, "n": 1, "pago": 0}, {"nome": "RIANDRE CORREIA MENEGARDO", "data": "26/08/2025", "dataISO": "2025-08-26", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 790.0, "n": 1, "pago": 0}, {"nome": "MURILO PETRO ROMANO", "data": "26/08/2025", "dataISO": "2025-08-26", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "PIETRA PAGUNG DURÃES", "data": "26/08/2025", "dataISO": "2025-08-26", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LAURA LEITE SOUA SILVA", "data": "27/08/2025", "dataISO": "2025-08-27", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ANTONIO CALIMAN FALQUETO", "data": "27/08/2025", "dataISO": "2025-08-27", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "IAN LOOSE DUBBERSTEIN", "data": "27/08/2025", "dataISO": "2025-08-27", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "BERNARDO CORONA HOLZ", "data": "27/08/2025", "dataISO": "2025-08-27", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "PEDRO RICARDO VIEIRA KINSCH", "data": "28/08/2025", "dataISO": "2025-08-28", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "JULIA LAUERS BERGAMI", "data": "28/08/2025", "dataISO": "2025-08-28", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "THEO HENRIQUE EGERT SILVA", "data": "28/08/2025", "dataISO": "2025-08-28", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 250.0, "n": 1, "pago": 0}, {"nome": "DAVI NUNES PINAFFO", "data": "29/08/2025", "dataISO": "2025-08-29", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "LORENZO DOS SANTOS RODRIGUES", "data": "30/08/2025", "dataISO": "2025-08-30", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ISIS PAGUNG (C0NSULTA)", "data": "04/08/2025", "dataISO": "2025-08-04", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "CRED 1X", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "GAEL E RAVI WUTKE", "data": "05/08/2025", "dataISO": "2025-08-05", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "BERNARDO NATALI", "data": "05/08/2025", "dataISO": "2025-08-05", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "DINHEIRO", "valor": 840.0, "n": 1, "pago": 0}, {"nome": "HELENA GARCIA VELTEN", "data": "01/09/2025", "dataISO": "2025-09-01", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "GABRIEL GUARIZI STREPEZA", "data": "01/09/2025", "dataISO": "2025-09-01", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ANA JULIA GALVAO TOREZANI", "data": "01/09/2025", "dataISO": "2025-09-01", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 250.0, "n": 1, "pago": 0}, {"nome": "EMANUEL MORANDI BRAIDO", "data": "01/09/2025", "dataISO": "2025-09-01", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 250.0, "n": 1, "pago": 0}, {"nome": "SARAH MOSCHEM DALAPICOLA", "data": "02/09/2025", "dataISO": "2025-09-02", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 250.0, "n": 1, "pago": 0}, {"nome": "RAYAN BRANDEMBRUG CARVALHO", "data": "02/09/2025", "dataISO": "2025-09-02", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "IAN LOOSE DURBBERSTEIN", "data": "05/03/2025", "dataISO": "2025-03-05", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 390.0, "n": 1, "pago": 0}, {"nome": "INACIO LOTERIO FARDIN", "data": "02/09/2025", "dataISO": "2025-09-02", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "HENRY BENEVIDES WOLTICHOSKI", "data": "05/03/2025", "dataISO": "2025-03-05", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 1580.0, "n": 1, "pago": 0}, {"nome": "JOAQUIM CAPPATO MONTEBELLER", "data": "02/09/2025", "dataISO": "2025-09-02", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "CRED 1X", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ARTHUR DE SOUZA BARBOSA", "data": "07/03/2025", "dataISO": "2025-03-07", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "GABRIEL DEGAN ZANETTI", "data": "03/09/2025", "dataISO": "2025-09-03", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "BERNARDO ULICK ZUCCOLOTTO", "data": "07/03/2025", "dataISO": "2025-03-07", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE KLEMZ", "data": "03/09/2025", "dataISO": "2025-09-03", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "SOFIA GOMES DE SOUZA", "data": "10/03/2025", "dataISO": "2025-03-10", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "HEITOR ZAMBON HEMERLY", "data": "03/09/2025", "dataISO": "2025-09-03", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ANTONIO CALIMAN FALQUETO", "data": "10/03/2025", "dataISO": "2025-03-10", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LUISA BARCELOS DA COSTA", "data": "04/09/2025", "dataISO": "2025-09-04", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 270.0, "n": 1, "pago": 0}, {"nome": "LUCCA CORTELETI VENTURINI", "data": "10/03/2025", "dataISO": "2025-03-10", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "MATHEUS IMBERTI JOSE", "data": "04/09/2025", "dataISO": "2025-09-04", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "HELENA GARCIA VELTEN", "data": "11/03/2025", "dataISO": "2025-03-11", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 790.0, "n": 1, "pago": 0}, {"nome": "SOPHYA CUNHA TAVARES (CONSULTA)", "data": "04/09/2025", "dataISO": "2025-09-04", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "CRED 1X", "valor": 490.0, "n": 1, "pago": 0}, {"nome": "NICOLAS DIAS ROCHA", "data": "11/03/2025", "dataISO": "2025-03-11", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "JULIA DE SOUZA ALBERTO (CONSULTA)", "data": "12/03/2025", "dataISO": "2025-03-12", "ano": 2025, "mes": 3, "tipo": "MULTITEST", "pgto": "CRED 1X", "valor": 490.0, "n": 1, "pago": 0}, {"nome": "HENRICO MENEZES FRIZZERA", "data": "05/09/2025", "dataISO": "2025-09-05", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "LUISA HORTA CASTRO", "data": "12/03/2025", "dataISO": "2025-03-12", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "PIETRA BAPTISTA BUDKOSWKY", "data": "05/09/2025", "dataISO": "2025-09-05", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MILENA BASTOS DA SILVA", "data": "13/03/2025", "dataISO": "2025-03-13", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DEB", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ARTHUR ABREU GALDINO", "data": "05/09/2025", "dataISO": "2025-09-05", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "JOAQUIM CAPATTO MONTEBELLER", "data": "13/03/2025", "dataISO": "2025-03-13", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "GABRIEL FERNANDES RIZZI", "data": "06/09/2025", "dataISO": "2025-09-06", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "BERNARDO OLIVEIRA PESSOA", "data": "14/03/2025", "dataISO": "2025-03-14", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ARTHUR DE SOUZA BARBOSA", "data": "08/09/2025", "dataISO": "2025-09-08", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "VICTORIA PINA STELZER DE OLIVEIRA", "data": "14/03/2025", "dataISO": "2025-03-14", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DEB", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "MARIA VITO\\TORIA SPALENZA DA COSTA", "data": "08/09/2025", "dataISO": "2025-09-08", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MARIA VALENTINA PIERAZZO MORAU", "data": "14/03/2025", "dataISO": "2025-03-14", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "BERNARDO ULICK ZUCCOLOTTO", "data": "08/09/2025", "dataISO": "2025-09-08", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ISABEL ZANQUE ALVES (LASER)", "data": "15/03/2025", "dataISO": "2025-03-15", "ano": 2025, "mes": 3, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 170.0, "n": 1, "pago": 0}, {"nome": "LUISAHORTA CASTRO", "data": "09/09/2025", "dataISO": "2025-09-09", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "CRED 1X", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "SIDNETE CHIAPANI MATTEDI (PATCH)", "data": "17/03/2025", "dataISO": "2025-03-17", "ano": 2025, "mes": 3, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "MURILO MIELKE BORTOLINI VERNEQUE", "data": "09/09/2025", "dataISO": "2025-09-09", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "BRYAN ALBERTI MARIANO", "data": "17/03/2025", "dataISO": "2025-03-17", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MARCELA REGINA DE SOUZA BRAGA", "data": "09/09/2025", "dataISO": "2025-09-09", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "THEO MACEDO FREITAS", "data": "17/02/2025", "dataISO": "2025-02-17", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ANTONIO ARAUJO MARTINS", "data": "09/09/2025", "dataISO": "2025-09-09", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "GABRIEL GUARIZI STREZEPA", "data": "18/03/2025", "dataISO": "2025-03-18", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MARIA ISABELLA DOS SANTOS LOTERIO", "data": "10/09/2025", "dataISO": "2025-09-10", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 260.0, "n": 1, "pago": 0}, {"nome": "HELOIZA KRUGER CABRAL", "data": "18/03/2025", "dataISO": "2025-03-18", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "JOSE E PEDRO ANTONIO MOREIRA ERLER (CONSULTA)", "data": "10/09/2025", "dataISO": "2025-09-10", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DEB", "valor": 840.0, "n": 1, "pago": 0}, {"nome": "NILTON FREIRE SAMPAIO NETO", "data": "18/03/2025", "dataISO": "2025-03-18", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MGUEL ROSA PAIER", "data": "11/09/2025", "dataISO": "2025-09-11", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "CRED 6X", "valor": 450.0, "n": 6, "pago": 0}, {"nome": "LETICIA BASTOS MONTI", "data": "18/03/2025", "dataISO": "2025-03-18", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "MARIA EDUARDA FARIAS DOS SANTOS", "data": "11/09/2025", "dataISO": "2025-09-11", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 250.0, "n": 1, "pago": 0}, {"nome": "ISIS PEREIRA FADINI", "data": "19/03/2025", "dataISO": "2025-03-19", "ano": 2025, "mes": 3, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "HELENA E PEDRO FIDELES VASCONCELOS", "data": "12/09/2025", "dataISO": "2025-09-12", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 790.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE KLEMZ", "data": "19/03/2025", "dataISO": "2025-03-19", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "YASMIN CALIXTO XAVIER", "data": "15/09/2025", "dataISO": "2025-09-15", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 840.0, "n": 1, "pago": 0}, {"nome": "MATHIAS FRANÇA", "data": "19/03/2025", "dataISO": "2025-03-19", "ano": 2025, "mes": 3, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "MIGUEL DELGADO", "data": "15/09/2025", "dataISO": "2025-09-15", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "BERNARDO DA SILVA PEREIRA", "data": "20/03/2025", "dataISO": "2025-03-20", "ano": 2025, "mes": 3, "tipo": "MULTITEST", "pgto": "DEB", "valor": 350.0, "n": 1, "pago": 0}, {"nome": "MANUEL BONIZIOLI BULL", "data": "16/09/2025", "dataISO": "2025-09-16", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 260.0, "n": 1, "pago": 0}, {"nome": "GABRIEL DIAS GOESI", "data": "20/03/2025", "dataISO": "2025-03-20", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "THEO MACEDO FREITAS", "data": "16/09/2025", "dataISO": "2025-09-16", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LORENZO DOS SANTOS RODRIGUES", "data": "20/03/2025", "dataISO": "2025-03-20", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MIGUEL KELLER SAAR", "data": "16/09/2025", "dataISO": "2025-09-16", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DEB", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "MIGUEL DELGADO", "data": "20/03/2025", "dataISO": "2025-03-20", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "EDUARDO ZANOTELLI GUILIATTE", "data": "16/09/2025", "dataISO": "2025-09-16", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 250.0, "n": 1, "pago": 0}, {"nome": "RIANDRE CORRERIA MENEGARDO", "data": "21/03/2025", "dataISO": "2025-03-21", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 790.0, "n": 1, "pago": 0}, {"nome": "ISSI PAGUNG SOTELLE (CONSULTA)", "data": "16/09/2025", "dataISO": "2025-09-16", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DEB", "valor": 490.0, "n": 1, "pago": 0}, {"nome": "PIETRA PAGUNG DURÃES", "data": "24/03/2025", "dataISO": "2025-03-24", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 840.0, "n": 1, "pago": 0}, {"nome": "ANA JHULIE CORDEIRO SOEIRO", "data": "17/09/2025", "dataISO": "2025-09-17", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 320.0, "n": 1, "pago": 0}, {"nome": "MATHEUS IMBERTI JOSE", "data": "24/03/2025", "dataISO": "2025-03-24", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "ANA CLARA PIRES DANTAS ALVES", "data": "17/09/2025", "dataISO": "2025-09-17", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 320.0, "n": 1, "pago": 0}, {"nome": "MIGUEL FERREIRA ALBANI", "data": "24/03/2025", "dataISO": "2025-03-24", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "ANA CLARA PIRES DANTAS ALVES", "data": "17/09/2025", "dataISO": "2025-09-17", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MUIRILO FERNANDES SANGALI", "data": "26/03/2025", "dataISO": "2025-03-26", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 1185.0, "n": 1, "pago": 0}, {"nome": "MILENA BASTOS DA SILVA", "data": "17/09/2025", "dataISO": "2025-09-17", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DEB", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE SANTOS MANZOLI", "data": "28/03/2025", "dataISO": "2025-03-28", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "BRAYAN GARCIA DA ROCHA", "data": "17/09/2025", "dataISO": "2025-09-17", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "MURILO PIETRO ROMANO", "data": "28/03/2025", "dataISO": "2025-03-28", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 420.0, "n": 1, "pago": 0}, {"nome": "LARA CINHA MOROZINI", "data": "17/09/2025", "dataISO": "2025-09-17", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 840.0, "n": 1, "pago": 0}, {"nome": "HENRIQUE COFFLER MONTEBELLER", "data": "31/03/2025", "dataISO": "2025-03-31", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DEB", "valor": 450.0, "n": 1, "pago": 0}, {"nome": "ANA CLARA LORETE SIEBERT", "data": "18/09/2025", "dataISO": "2025-09-18", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MARIA VITORIA SPALENZA DA COSTA", "data": "31/03/2025", "dataISO": "2025-03-31", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "IAGO GAROZI COSTA", "data": "18/09/2025", "dataISO": "2025-09-18", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}, {"nome": "MARIA VITORIA SPALENZA DA COSTA (PRICK)", "data": "31/03/2025", "dataISO": "2025-03-31", "ano": 2025, "mes": 3, "tipo": "MULTITEST", "pgto": "DINHEIRO", "valor": 300.0, "n": 1, "pago": 0}, {"nome": "ELOISA BRIDI GHISOLFI", "data": "18/09/2025", "dataISO": "2025-09-18", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "DINHEIRO", "valor": 395.0, "n": 1, "pago": 0}];
+var PARC_2025 = [{"nome": "GABRIELI DIAS GOESI", "data": "20/01/2025", "dataISO": "2025-01-20", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "LUCCA CORTELETI VENTURINI", "data": "09/07/2025", "dataISO": "2025-07-09", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "THEO MACEDO FREITAS", "data": "09/07/2025", "dataISO": "2025-07-09", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "LUIZA DA SILVA (CONSULTA)", "data": "23/01/2025", "dataISO": "2025-01-23", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 440.0, "n": 2, "pago": 0}, {"nome": "PEDRO DA SILVA", "data": "27/01/2025", "dataISO": "2025-01-27", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "BERNARDO OLIVEIRA PESSOA", "data": "28/01/2025", "dataISO": "2025-01-28", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JOAO LUCAS CAPUCHO NIERO DA COSTA", "data": "11/07/2025", "dataISO": "2025-07-11", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ARTHUR AGOSTINI GASPARINI (CONSULTA)", "data": "29/01/2025", "dataISO": "2025-01-29", "ano": 2025, "mes": 1, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ANA CLARA PINAFFO", "data": "14/07/2025", "dataISO": "2025-07-14", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 6X", "valor": 450.0, "n": 6, "pago": 0}, {"nome": "GABRIEL FERNANDES RIZZI", "data": "30/01/2025", "dataISO": "2025-01-30", "ano": 2025, "mes": 1, "tipo": "IT", "pgto": "CRED 4X", "valor": 900.0, "n": 4, "pago": 0}, {"nome": "SOFIA GOMES DE SOUZA", "data": "16/07/2025", "dataISO": "2025-07-16", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 670.0, "n": 2, "pago": 0}, {"nome": "HELENA E CECILIA GIURIATTO MARQUES", "data": "16/07/2025", "dataISO": "2025-07-16", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 770.0, "n": 2, "pago": 0}, {"nome": "JOAO FRANCISCO OLIVERA MORELLA | NILTON FREIRE NETO", "data": "21/07/2025", "dataISO": "2025-07-21", "ano": 2025, "mes": 7, "tipo": "IT", "pgto": "CRED 2X", "valor": 900.0, "n": 2, "pago": 0}, {"nome": "VICTORIA PINA STELZER DE OLIVEIRA", "data": "05/02/2025", "dataISO": "2025-02-05", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "RUAN LUCCA MUNIZ KAMPINE", "data": "01/08/2025", "dataISO": "2025-08-01", "ano": 2025, "mes": 8, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 350.0, "n": 2, "pago": 0}, {"nome": "JULIA PESSIM GASPARINI", "data": "02/08/2025", "dataISO": "2025-08-02", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 6X", "valor": 900.0, "n": 6, "pago": 0}, {"nome": "ALICE GALÃO", "data": "13/02/2025", "dataISO": "2025-02-13", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "DANIEL GODIN DIAS (TPO)", "data": "14/02/2025", "dataISO": "2025-02-14", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "CRED 3X", "valor": 1780.0, "n": 3, "pago": 0}, {"nome": "INACIO LOTÉRIO", "data": "14/02/2025", "dataISO": "2025-02-14", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 3X", "valor": 900.0, "n": 3, "pago": 0}, {"nome": "MARIA VALENTINA PIERAZZO MORAU", "data": "07/08/2025", "dataISO": "2025-08-07", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ENZO FERREIRA DE OLIVEIRA CESAR (PRICK)", "data": "17/02/2025", "dataISO": "2025-02-17", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 350.0, "n": 2, "pago": 0}, {"nome": "BERNARDO OLIVEIRA PESSOA", "data": "08/08/2025", "dataISO": "2025-08-08", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JOAO FRANCISCO OLIVEIRA MORELLA", "data": "25/02/2025", "dataISO": "2025-02-25", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ALICE ALVES TEIXEIRA (PRICK)", "data": "25/02/2025", "dataISO": "2025-02-25", "ano": 2025, "mes": 2, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 350.0, "n": 2, "pago": 0}, {"nome": "GABRIEL DIAS GOESE", "data": "20/08/2025", "dataISO": "2025-08-20", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JHULIA ZANETTE", "data": "27/02/2025", "dataISO": "2025-02-27", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "RUAN LUCCA MUNIZ KAMPINE", "data": "21/08/2025", "dataISO": "2025-08-21", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 2X", "valor": 900.0, "n": 2, "pago": 0}, {"nome": "DAVI NUNES PINAFFO", "data": "29/08/2025", "dataISO": "2025-08-29", "ano": 2025, "mes": 8, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "BERNARDO OLIVEIRA PESSOA", "data": "14/03/2025", "dataISO": "2025-03-14", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MARIA VALENTINA PIERAZZO MORAU", "data": "14/03/2025", "dataISO": "2025-03-14", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "THEO MACEDO FREITAS", "data": "17/02/2025", "dataISO": "2025-02-17", "ano": 2025, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "NILTON FREIRE SAMPAIO NETO", "data": "18/03/2025", "dataISO": "2025-03-18", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MGUEL ROSA PAIER", "data": "11/09/2025", "dataISO": "2025-09-11", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "CRED 6X", "valor": 450.0, "n": 6, "pago": 0}, {"nome": "GABRIEL DIAS GOESI", "data": "20/03/2025", "dataISO": "2025-03-20", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ANA CLARA PIRES DANTAS ALVES", "data": "17/09/2025", "dataISO": "2025-09-17", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ANA CLARA LORETE SIEBERT", "data": "18/09/2025", "dataISO": "2025-09-18", "ano": 2025, "mes": 9, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ISIS PAGUNG (CONSULTA)", "data": "10/03/2025", "dataISO": "2025-03-10", "ano": 2025, "mes": 3, "tipo": "MULTITEST", "pgto": "CRED 3X", "valor": 490.0, "n": 3, "pago": 0}, {"nome": "JHULIA ZANETTE", "data": "27/03/2025", "dataISO": "2025-03-27", "ano": 2025, "mes": 3, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MARINA DALLA BERNRDINA BECEVELI", "data": "25/09/2025", "dataISO": "2025-09-25", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 350.0, "n": 2, "pago": 0}, {"nome": "NICAYO ROCHA DE LANDES", "data": "29/09/2025", "dataISO": "2025-09-29", "ano": 2025, "mes": 9, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 350.0, "n": 2, "pago": 0}, {"nome": "MANUELA MACIEL DOS SANTOS", "data": "03/10/2025", "dataISO": "2025-10-03", "ano": 2025, "mes": 10, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "RUAN LUCCA MUNIZ KAMPINE", "data": "08/10/2025", "dataISO": "2025-10-08", "ano": 2025, "mes": 10, "tipo": "IT", "pgto": "CRED 2X", "valor": 900.0, "n": 2, "pago": 0}, {"nome": "BENTO DALLA BERNARDINA BECEVELI", "data": "03/04/2025", "dataISO": "2025-04-03", "ano": 2025, "mes": 4, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 350.0, "n": 2, "pago": 0}, {"nome": "GABRIELI DIAS GOESI", "data": "13/10/2025", "dataISO": "2025-10-13", "ano": 2025, "mes": 10, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "HELENA SOUZA OLIVEIRA (CONSULTA)", "data": "15/10/2025", "dataISO": "2025-10-15", "ano": 2025, "mes": 10, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ANA CLARA PIRES DANTAS ALVES", "data": "15/10/2025", "dataISO": "2025-10-15", "ano": 2025, "mes": 10, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "LUISA OLIVEIRA DA HORA (CONSULTA)", "data": "15/10/2025", "dataISO": "2025-10-15", "ano": 2025, "mes": 10, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JOAO PEDRO VIEIRA POLEZ", "data": "14/04/2025", "dataISO": "2025-04-14", "ano": 2025, "mes": 4, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "BERNARDO OLIVEIRA PESSOA", "data": "17/10/2025", "dataISO": "2025-10-17", "ano": 2025, "mes": 10, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JOAO FRANCISCO OLIVEIRA MORELLA", "data": "22/04/2025", "dataISO": "2025-04-22", "ano": 2025, "mes": 4, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JULIA PESSIM GASPARINI", "data": "21/10/2025", "dataISO": "2025-10-21", "ano": 2025, "mes": 10, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "SOFIA GOMES DE SOUZA", "data": "22/10/2025", "dataISO": "2025-10-22", "ano": 2025, "mes": 10, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "SAMUEL GODIM DE MATRE", "data": "30/04/2025", "dataISO": "2025-04-30", "ano": 2025, "mes": 4, "tipo": "IT", "pgto": "CRED 3X", "valor": 450.0, "n": 3, "pago": 0}, {"nome": "SAMUEL GODIM DE MATRE", "data": "30/04/2025", "dataISO": "2025-04-30", "ano": 2025, "mes": 4, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 350.0, "n": 2, "pago": 0}, {"nome": "MARIA VALENTINA PIERAZZO", "data": "17/10/2025", "dataISO": "2025-10-17", "ano": 2025, "mes": 10, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "GABRIELI DIAS GOESI", "data": "02/05/2025", "dataISO": "2025-05-02", "ano": 2025, "mes": 5, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "TIAGO MOGNATO", "data": "06/05/2025", "dataISO": "2025-05-06", "ano": 2025, "mes": 5, "tipo": "IT", "pgto": "CRED 2X", "valor": 900.0, "n": 2, "pago": 0}, {"nome": "MILENA BASTOS DA SILVA", "data": "09/11/2025", "dataISO": "2025-11-09", "ano": 2025, "mes": 11, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MARDOQUEO OLIVEIRA ELIZEU", "data": "06/05/2025", "dataISO": "2025-05-06", "ano": 2025, "mes": 5, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "BERNARDO ULICK ZUCCOLOTTO", "data": "10/11/2025", "dataISO": "2025-11-10", "ano": 2025, "mes": 11, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "HENRIQUE PERONI NEPEL", "data": "08/05/2025", "dataISO": "2025-05-08", "ano": 2025, "mes": 5, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "REBECCA MELOTTI RIBON DA SILVA (PATCH)", "data": "17/11/2025", "dataISO": "2025-11-17", "ano": 2025, "mes": 11, "tipo": "MULTITEST", "pgto": "CRED 3X", "valor": 500.0, "n": 3, "pago": 0}, {"nome": "ALICE TECHERS RUTSATZ", "data": "13/05/2025", "dataISO": "2025-05-13", "ano": 2025, "mes": 5, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MAIRA GUARNIERI PERIM", "data": "18/11/2025", "dataISO": "2025-11-18", "ano": 2025, "mes": 11, "tipo": "IT", "pgto": "CRED 3X", "valor": 1350.0, "n": 3, "pago": 0}, {"nome": "ALICIA JASKE ALVES", "data": "19/05/2025", "dataISO": "2025-05-19", "ano": 2025, "mes": 5, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "LAIS GUISOLFI GONCALVES", "data": "26/11/2025", "dataISO": "2025-11-26", "ano": 2025, "mes": 11, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 350.0, "n": 2, "pago": 0}, {"nome": "JULIA E RUDMILLA PESSIM", "data": "22/05/2025", "dataISO": "2025-05-22", "ano": 2025, "mes": 5, "tipo": "IT", "pgto": "CRED 4X", "valor": 1400.0, "n": 4, "pago": 0}, {"nome": "BERNARDO OLIVEIRA", "data": "16/05/2025", "dataISO": "2025-05-16", "ano": 2025, "mes": 5, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "SOFIA GOMES DE SOUZA", "data": "28/11/2025", "dataISO": "2025-11-28", "ano": 2025, "mes": 11, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JOAO PEDRO VIEIRA POLEZ", "data": "29/11/2025", "dataISO": "2025-11-29", "ano": 2025, "mes": 11, "tipo": "IT", "pgto": "CRED 3X", "valor": 450.0, "n": 3, "pago": 0}, {"nome": "MARIA VALENTINA PIERAZZO MORAU", "data": "27/05/2025", "dataISO": "2025-05-27", "ano": 2025, "mes": 5, "tipo": "IT", "pgto": "CRED 2X", "valor": 800.0, "n": 2, "pago": 0}, {"nome": "LAIS GUISOLFI GONCALVES (CONSULTA)", "data": "26/11/2025", "dataISO": "2025-11-26", "ano": 2025, "mes": 11, "tipo": "MULTITEST", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "LUISA COSLOP COMERIO", "data": "28/05/2025", "dataISO": "2025-05-28", "ano": 2025, "mes": 5, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JOA FRANCISCO OLIVEIORA MORELLA", "data": "01/12/2025", "dataISO": "2025-12-01", "ano": 2025, "mes": 12, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "RUAN LUCCA MUNIZ KAMPINE", "data": "04/12/2025", "dataISO": "2025-12-04", "ano": 2025, "mes": 12, "tipo": "IT", "pgto": "CRED 2X", "valor": 1800.0, "n": 2, "pago": 0}, {"nome": "JULIA PESSIN GASPARINI", "data": "04/12/2025", "dataISO": "2025-12-04", "ano": 2025, "mes": 12, "tipo": "IT", "pgto": "CRED 3X", "valor": 450.0, "n": 3, "pago": 0}, {"nome": "PIETRO ZANOTTI MENEZES MALTA", "data": "08/12/2025", "dataISO": "2025-12-08", "ano": 2025, "mes": 12, "tipo": "IT", "pgto": "CRED 2X", "valor": 900.0, "n": 2, "pago": 0}, {"nome": "GABRIEL FERNANDES RIZZI", "data": "17/06/2025", "dataISO": "2025-06-17", "ano": 2025, "mes": 6, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "BERNARDO ULICK ZUCCOLOTTO", "data": "11/12/2025", "dataISO": "2025-12-11", "ano": 2025, "mes": 12, "tipo": "IT", "pgto": "CRED 3X", "valor": 450.0, "n": 3, "pago": 0}, {"nome": "VICTORIA PINA STELZER DE OLIVEIRA", "data": "23/06/2025", "dataISO": "2025-06-23", "ano": 2025, "mes": 6, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "GABRIEL DIAS GOESI", "data": "26/06/2025", "dataISO": "2025-06-26", "ano": 2025, "mes": 6, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "GABRIEL DIAS DOESI", "data": "18/12/2025", "dataISO": "2025-12-18", "ano": 2025, "mes": 12, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JOAO PEDRO VIERA POLEZ", "data": "28/06/2025", "dataISO": "2025-06-28", "ano": 2025, "mes": 6, "tipo": "IT", "pgto": "CRED 3X", "valor": 900.0, "n": 3, "pago": 0}, {"nome": "LUISA COSLOP COMERIO", "data": "30/06/2025", "dataISO": "2025-06-30", "ano": 2025, "mes": 6, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "SOFIA GOMES DE SOUZA", "data": "26/12/2025", "dataISO": "2025-12-26", "ano": 2025, "mes": 12, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}];
+var PARC_2026 = [{"nome": "JULIA PESSIN GASPARINI", "data": "06/01/2026", "dataISO": "2026-01-06", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "ANA CLARA PIRES", "data": "08/01/2026", "dataISO": "2026-01-08", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "BERNARDO ULICK ZUCCOLOTTO", "data": "12/01/2026", "dataISO": "2026-01-12", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JOAO FRANCISCO OLIVEIRA MORELLA", "data": "15/01/2026", "dataISO": "2026-01-15", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "MILENA BASTOS DA SILVA", "data": "20/01/2026", "dataISO": "2026-01-20", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "BENJAMIN DUARTE SANTANA DOS REIS", "data": "26/01/2026", "dataISO": "2026-01-26", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "SOFIA GOMES DE SOUZA", "data": "28/01/2026", "dataISO": "2026-01-28", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "GABRIELI DIAS GOESI", "data": "30/01/2026", "dataISO": "2026-01-30", "ano": 2026, "mes": 1, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "JOAO PEDRO VIEIRA POLEZ", "data": "12/02/2026", "dataISO": "2026-02-12", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 400.0, "n": 2, "pago": 0}, {"nome": "ANA CLARA PIRES DANTAS ALVES", "data": "25/02/2026", "dataISO": "2026-02-25", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 450.0, "n": 2, "pago": 0}, {"nome": "GUSTAVO ANDRADE LIMA", "data": "26/02/2026", "dataISO": "2026-02-26", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 500.0, "n": 2, "pago": 0}, {"nome": "ARTHUR ABREU GALDINO", "data": "26/02/2026", "dataISO": "2026-02-26", "ano": 2026, "mes": 2, "tipo": "IT", "pgto": "CRED 2X", "valor": 500.0, "n": 2, "pago": 0}];
+var BOLETOS = [{"desc": "Materiais Prick Test / Antígenos IT", "cat": "Materiais/Insumos", "val": 3667.01, "venc": "2026-04-15", "status": "pend"}, {"desc": "Repasse laboratório exames", "cat": "Repasse laboratório", "val": 2134.34, "venc": "2026-04-20", "status": "pend"}, {"desc": "Manutenção equipamentos laser", "cat": "Equipamentos", "val": 1732.0, "venc": "2026-04-28", "status": "pend"}, {"desc": "Aluguel consultório", "cat": "Aluguel", "val": 768.6, "venc": "2026-05-05", "status": "pend"}, {"desc": "Fornecedor antígenos IT Mar/2026", "cat": "Materiais/Insumos", "val": 3472.8, "venc": "2026-03-30", "status": "venc"}, {"desc": "Materiais consumo Jan/2026", "cat": "Materiais/Insumos", "val": 593.0, "venc": "2026-01-10", "status": "pago"}, {"desc": "Repasse laboratório Fev/2026", "cat": "Repasse laboratório", "val": 2940.2, "venc": "2026-02-20", "status": "pago"}, {"desc": "Aluguel Jan/2026", "cat": "Aluguel", "val": 720.0, "venc": "2026-01-05", "status": "pago"}];
+
+var STATS = {"2022": {"meses": [3040, 6050, 2800, 5070, 7890, 5530, 5390, 6960, 4590, 10500, 10470, 12140], "meses_count": [8, 11, 8, 14, 17, 14, 11, 18, 11, 27, 23, 31], "tipos": {"IT": 172, "MULTITEST": 21}, "total": 80430, "count": 193}, "2023": {"meses": [13445, 18090, 19415, 9115, 11345, 12252, 19360, 10665, 15400, 10075, 17930, 9200], "meses_count": [35, 34, 39, 19, 27, 31, 40, 28, 39, 22, 40, 22], "tipos": {"IT": 326, "MULTITEST": 50}, "total": 166292, "count": 376}, "2024": {"meses": [15320, 12105, 14585, 11955, 9765, 16260, 18755, 16040, 13680, 10075, 15640, 15295], "meses_count": [35, 28, 35, 30, 24, 40, 42, 37, 32, 23, 34, 35], "tipos": {"IT": 294, "MULTITEST": 101}, "total": 169475, "count": 395}, "2025": {"meses": [17675, 26405, 21000, 20635, 25930, 19095, 22620, 31030, 28020, 28660, 25885, 34995], "meses_count": [41, 54, 44, 41, 56, 47, 46, 73, 69, 69, 59, 69], "tipos": {"IT": 510, "MULTITEST": 158}, "total": 301950, "count": 668}, "2026": {"meses": [20200, 27745, 0, 0, 0, 0, 0, 0, 0, 900, 0, 0], "meses_count": [43, 58, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0], "tipos": {"IT": 94, "MULTITEST": 9}, "total": 48845, "count": 103}};
+var RECEITA_HIST = [68760, 52570, 43505, 80430, 166292, 169475, 301950, 48845];
+var PACS_HIST    = [132, 87, 92, 193, 376, 395, 668, 103];
+var TICKETS_HIST = [521, 604, 473, 417, 442, 429, 452, 474];
+var ANOS         = ["2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026"];
+var ACC_2024     = [15320, 27425, 42010, 53965, 63730, 79990, 98745, 114785, 128465, 138540, 154180, 169475];
+var ACC_2025     = [17675, 44080, 65080, 85715, 111645, 130740, 153360, 184390, 212410, 241070, 266955, 301950];
+var ACC_2026     = [20200, 47945, 47945, 47945, 47945, 47945, 47945, 47945, 47945, 48845, 48845, 48845];
+
+var tipos = ['IT','MULTITEST','LASER','PATCH TEST','CONSULTA','TPO','PRICK TEST'];
+var pgtos = ['DINHEIRO','DEB','CRED 1X','CRED 2X','CRED 3X','CRED 4X','CRED 5X','CRED 6X','DEPÓSITO','CHEQUE 6X'];
+var sessao = [];
+var fS25='',fT25='',fP25='',fS26='',fT26='';
+var charts = {};
+
+var fmt    = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+var fmtK   = v => v >= 1000 ? 'R$ '+Math.round(v/1000)+'k' : 'R$ '+Math.round(v);
+var getNP  = p => { if(!p) return 1; const m=p.match(/CRED\s*(\d+)X/i); if(m) return parseInt(m[1]); if(p.includes('CHEQUE')) return 6; return 1; };
+var fmtDate= iso => { if(!iso) return '—'; const d=new Date(iso+'T12:00:00'); return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; };
+var tcls   = t => { const u=(t||'').toUpperCase(); if(u==='IT') return 'b-it'; if(u.includes('MULTI')||u.includes('PRICK')) return 'b-multi'; if(u==='LASER') return 'b-laser'; if(u.includes('PATCH')) return 'b-patch'; return 'b-con'; };
+var pcls   = p => { const u=(p||'').toUpperCase(); if(u==='DINHEIRO') return 'b-din'; if(u.includes('CRED')) return 'b-cred'; if(u==='DEB') return 'b-deb'; if(u.includes('DEP')) return 'b-dep'; return 'b-din'; };
+var showMsg= (id,t,txt) => { const el=document.getElementById(id); el.className='msg '+t; el.innerHTML=(t==='ok'?'✓ ':'⚠ ')+txt; setTimeout(()=>el.className='msg',4000); };
+
+function goto(id,el){ document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active')); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); if(el) el.classList.add('active'); document.getElementById('page-'+id).classList.add('active'); }
+
+document.getElementById('tbdate').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+
+// ── GRÁFICO 1: Receita mensal por ano ──
+function switchMensal(ano, el){
+  document.querySelectorAll('#page-dash .yt').forEach(y=>y.classList.remove('active'));
+  el.classList.add('active');
+  const meses = STATS[ano].meses;
+  const isAtual = ano === 2026;
+  const cores = meses.map((v,i) => {
+    if(v === 0) return 'rgba(0,167,157,0.15)';
+    return isAtual ? (i < 2 ? '#00A79D' : 'rgba(0,167,157,0.2)') : '#00A79D';
+  });
+  if(charts.mensal) charts.mensal.destroy();
+  charts.mensal = new Chart(document.getElementById('cMensal'),{
+    type:'bar',
+    data:{labels:MESES,datasets:[{data:meses,backgroundColor:cores,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>c.raw>0?'R$ '+Math.round(c.raw).toLocaleString('pt-BR'):'(sem dado)'}}},
+      scales:{y:{beginAtZero:true,ticks:{callback:v=>fmtK(v),font:{size:10}}},x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+// ── GRÁFICO 2: Acumulado YTD ──
+function buildAcum(){
+  charts.acum = new Chart(document.getElementById('cAcum'),{
+    type:'line',
+    data:{labels:MESES,datasets:[
+      {label:'2026',data:ACC_2026,borderColor:'#00A79D',backgroundColor:'rgba(0,167,157,0.1)',tension:.4,pointRadius:4,pointBackgroundColor:'#00A79D',fill:true,borderWidth:2.5},
+      {label:'2025',data:ACC_2025,borderColor:'rgba(0,167,157,0.55)',borderDash:[],tension:.4,pointRadius:3,fill:false,borderWidth:1.5},
+      {label:'2024',data:ACC_2024,borderColor:'rgba(0,167,157,0.25)',borderDash:[5,3],tension:.4,pointRadius:2,fill:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',font:{size:10}}},x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+// ── GRÁFICO 3: Crescimento histórico ──
+function buildCrescent(){
+  const anos = ANOS;
+  const isAtual = anos.map(a=>a==='2026');
+  charts.cresc = new Chart(document.getElementById('cCresc'),{
+    type:'bar',
+    data:{labels:anos,datasets:[
+      {label:'Receita',data:RECEITA_HIST,backgroundColor:anos.map((a,i)=>a==='2026'?'rgba(0,167,157,0.55)':i===6?'#00A79D':'rgba(0,167,157,0.4)'),borderRadius:4,yAxisID:'y'},
+      {label:'Pacientes',type:'line',data:PACS_HIST,borderColor:'#4DC9C2',pointBackgroundColor:'#4DC9C2',pointRadius:4,tension:.3,yAxisID:'y1',borderWidth:2}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true,ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',font:{size:10}},grid:{display:false}},y1:{position:'right',beginAtZero:true,ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+// ── GRÁFICO 4: Ticket médio ──
+function buildTicket(){
+  charts.ticket = new Chart(document.getElementById('cTicket'),{
+    type:'bar',
+    data:{labels:ANOS,datasets:[{
+      data:TICKETS_HIST,
+      backgroundColor:ANOS.map((a,i)=>a==='2026'?'rgba(0,167,157,0.6)':i===6?'#00A79D':i===5?'rgba(0,167,157,0.5)':'rgba(0,167,157,0.25)'),
+      borderRadius:4
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'R$ '+c.raw}}},
+      scales:{y:{beginAtZero:false,min:350,ticks:{callback:v=>'R$'+v,font:{size:10}}},x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+// ── GRÁFICO 5: Pgto (2026) ──
+function buildPgto(){
+  // Calcular formas de pagamento dinamicamente
+  var pgCount = {};
+  _getPacsArrays().forEach(function(info) {
+    if (!info.individual) return;
+    info.dados.forEach(function(p) {
+      var key = p.pgto || 'OUTRO';
+      pgCount[key] = (pgCount[key] || 0) + 1;
+    });
+  });
+  // Ordenar por quantidade (maior primeiro)
+  var sorted = Object.keys(pgCount).sort(function(a,b){ return pgCount[b] - pgCount[a]; });
+  var labels = sorted;
+  var values = sorted.map(function(k){ return pgCount[k]; });
+  // Paleta de cores dinâmica
+  var palette = ['#00A79D','#B7791F','#2B6CB0','#4DC9C2','#6B46C1','#E53E3E','#2F855A','#D97706','#3182CE','#805AD5','#DD6B20','#38A169'];
+  var colors = labels.map(function(_,i){ return palette[i % palette.length]; });
+  var leg = document.getElementById('legPgto');
+  if (leg) leg.innerHTML = labels.map(function(k,i){ return '<div class="li"><div class="ls" style="background:'+colors[i]+'"></div>'+k+'</div>'; }).join('');
+  if (charts.pgto) charts.pgto.destroy();
+  var total = values.reduce(function(a,b){return a+b;},0);
+  charts.pgto = new Chart(document.getElementById('cPgto'),{
+    type:'doughnut',
+    data:{labels:labels,datasets:[{data:values,backgroundColor:colors,borderWidth:0,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:function(c){return c.label+': '+c.raw+' ('+ Math.round(c.raw/total*100)+'%)';}}}}}
+  });
+}
+
+// ── GRÁFICO 6: IT vs Multitest ──
+function buildEvol(){
+  var anos = Object.keys(STATS).map(Number).sort();
+  // Descobrir todos os tipos de procedimento usados
+  var allTipos = {};
+  anos.forEach(function(a){ if(STATS[a]&&STATS[a].tipos){ Object.keys(STATS[a].tipos).forEach(function(t){ allTipos[t]=1; }); } });
+  var tiposList = Object.keys(allTipos);
+  var evolPalette = ['#00A79D','#4DC9C2','#6B46C1','#B7791F','#E53E3E','#2B6CB0','#2F855A','#D97706'];
+  var datasets = tiposList.map(function(t,i){
+    return {label:t,data:anos.map(function(a){return STATS[a]&&STATS[a].tipos?STATS[a].tipos[t]||0:0;}),borderColor:evolPalette[i%evolPalette.length],backgroundColor:i===0?'rgba(0,167,157,.08)':'transparent',tension:.4,pointRadius:4,fill:i===0};
+  });
+  if(charts.evol) charts.evol.destroy();
+  charts.evol = new Chart(document.getElementById('cEvol'),{
+    type:'line',
+    data:{labels:anos.map(String),datasets:datasets},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:12}}},
+      scales:{y:{beginAtZero:true,ticks:{font:{size:10}}},x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+// ── GRÁFICO 7: Radar sazonalidade ──
+function buildRadar(){
+  charts.radar = new Chart(document.getElementById('cRadar'),{
+    type:'radar',
+    data:{labels:MESES,datasets:[
+      {label:'2026',data:STATS[2026].meses_count,borderColor:'#00A79D',backgroundColor:'rgba(0,167,157,0.15)',pointBackgroundColor:'#00A79D',pointRadius:3,borderWidth:2},
+      {label:'2025',data:STATS[2025].meses_count,borderColor:'rgba(229,62,62,.7)',backgroundColor:'rgba(229,62,62,.07)',pointBackgroundColor:'#E53E3E',pointRadius:2},
+      {label:'2024',data:STATS[2024].meses_count,borderColor:'rgba(43,108,176,.5)',backgroundColor:'transparent',pointBackgroundColor:'#2B6CB0',pointRadius:2,borderDash:[4,2]}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{r:{ticks:{font:{size:9},backdropColor:'transparent'},pointLabels:{font:{size:10}}}}}
+  });
+}
+
+// ── GRÁFICO 8: Balanço ──
+function buildBal(){
+  const recv = [3200,4800,5200,5800,6200,5500,6800,7200,6900,7200,6800,8000];
+  const bols = [1313,2154,2944,3100,3000,2500,4000,3000,3000,2500,2200,3200];
+  const saldo = recv.map((r,i)=>r-bols[i]);
+  charts.bal = new Chart(document.getElementById('cBal'),{
+    type:'bar',
+    data:{labels:MESES,datasets:[
+      {label:'Recebível',data:recv,backgroundColor:'rgba(0,167,157,0.7)',borderRadius:4},
+      {label:'Boleto',data:bols.map(b=>-b),backgroundColor:'rgba(229,62,62,.65)',borderRadius:4},
+      {label:'Saldo',data:saldo,type:'line',borderColor:'#2B6CB0',backgroundColor:'transparent',pointRadius:3,pointBackgroundColor:'#2B6CB0',tension:.3}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{stacked:false,ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{font:{size:10},callback:v=>(v<0?'-':'')+'R$'+Math.abs(Math.round(v/1000))+'k'}}}}
+  });
+}
+
+// ── GRÁFICO 9: Heatmap ──
+function buildHeatmap(){
+  var anos = Object.keys(STATS).map(Number).sort();
+  var anoMax = Math.max.apply(null, anos);
+  var allVals = [];
+  anos.forEach(function(a){ if(STATS[a]&&STATS[a].meses) STATS[a].meses.forEach(function(v){ if(v>0) allVals.push(v); }); });
+  var maxV = allVals.length ? Math.max.apply(null,allVals) : 1;
+  var minV = allVals.length ? Math.min.apply(null,allVals) : 0;
+  function getColor(val){
+    if(val===0) return '#F4F6F8';
+    var t = maxV>minV ? (val-minV)/(maxV-minV) : 0.5;
+    return 'rgba(0,167,157,'+(0.12+t*0.7)+')';
+  }
+  function getTC(val){ if(val===0) return '#8FA0B4'; var t=maxV>minV?(val-minV)/(maxV-minV):0.5; return t>0.45?'#004D49':'#1A2332'; }
+  var html='<div style="display:grid;grid-template-columns:38px repeat(12,1fr);gap:3px;font-size:10px">';
+  html+='<div></div>';
+  MESES.forEach(function(m){ html+='<div style="text-align:center;color:var(--t3);font-weight:500;padding:2px 0">'+m+'</div>'; });
+  anos.forEach(function(ano){
+    var isAtual = ano===anoMax;
+    html+='<div style="display:flex;align-items:center;font-weight:'+(isAtual?'700':'500')+';color:'+(isAtual?'var(--cvd)':'var(--t2)')+';font-size:11px">'+ano+(isAtual?' ✦':'')+'</div>';
+    var meses = STATS[ano]&&STATS[ano].meses ? STATS[ano].meses : [0,0,0,0,0,0,0,0,0,0,0,0];
+    var counts = STATS[ano]&&STATS[ano].meses_count ? STATS[ano].meses_count : [0,0,0,0,0,0,0,0,0,0,0,0];
+    meses.forEach(function(val,i){
+      var isReal = (ano < anoMax) || (counts[i] > 0);
+      var bg = val>0 ? getColor(val) : '#F4F6F8';
+      var tx = getTC(val);
+      var txt = val>0 ? (val>=1000?'R$'+Math.round(val/1000)+'k':'R$'+Math.round(val)) : '—';
+      var border = isAtual && isReal ? '2px solid rgba(0,167,157,0.5)' : '1px solid transparent';
+      html+='<div style="height:32px;border-radius:5px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:'+tx+';border:'+border+'" title="R$ '+val.toLocaleString('pt-BR')+'">'+txt+'</div>';
+    });
+  });
+  html+='</div>';
+  document.getElementById('heatmap-container').innerHTML=html;
+}
+
+// ── LISTA UNIFICADA DE PACIENTES ──
+var _todFiltros = {nome:'', tipo:'', pgto:'', mes:'', ano:''};
+
+// Detecta arrays PACS_XXXX disponíveis no escopo global
+function _getPacsArrays() {
+  var result = [];
+  var allYears = Object.keys(STATS).map(Number).sort();
+  allYears.forEach(function(y) {
+    var varName = 'PACS_' + y;
+    if (typeof window[varName] !== 'undefined' && Array.isArray(window[varName]) && window[varName].length > 0) {
+      result.push({ ano: y, dados: window[varName], individual: true });
+    } else if (STATS[y]) {
+      result.push({ ano: y, dados: null, individual: false });
+    }
+  });
+  return result;
+}
+
+function buildTodosSelects() {
+  var info = _getPacsArrays();
+  // Select de ano — dinâmico
+  var selAno = document.getElementById('flt-ano-todos');
+  if (selAno) {
+    selAno.innerHTML = '<option value="">Todos os anos</option>' + info.map(function(i) {
+      var label = i.individual ? i.ano : i.ano + ' (resumo)';
+      return '<option value="' + i.ano + '">' + label + '</option>';
+    }).join('');
+  }
+  // Select de procedimento — dinâmico
+  var selTipo = document.getElementById('flt-tipo-todos');
+  if (selTipo) {
+    selTipo.innerHTML = '<option value="">Todos os procedimentos</option>' + tipos.map(function(t) {
+      return '<option>' + t + '</option>';
+    }).join('');
+  }
+  // Select de pagamento — dinâmico
+  var selPgto = document.getElementById('flt-pgto-todos');
+  if (selPgto) {
+    selPgto.innerHTML = '<option value="">Todos os pagamentos</option>' + pgtos.map(function(p) {
+      return '<option>' + p + '</option>';
+    }).join('');
+  }
+}
+
+function filtAnoTodos(ano) {
+  _todFiltros.ano = ano;
+  renderTodos();
+}
+
+function filtTodos(campo, val) {
+  _todFiltros[campo] = val;
+  renderTodos();
+}
+
+function renderTodos() {
+  var anoFiltro = _todFiltros.ano;
+  var infoAgg = document.getElementById('todos-info-agg');
+  var thead = document.getElementById('t-todos-head');
+  var tb = document.getElementById('t-todos');
+  var sub = document.getElementById('todos-sub');
+
+  // Verifica se o ano selecionado é agregado (sem registros individuais)
+  var isAgg = false;
+  if (anoFiltro) {
+    var varName = 'PACS_' + anoFiltro;
+    isAgg = !(typeof window[varName] !== 'undefined' && Array.isArray(window[varName]) && window[varName].length > 0);
+  }
+
+  if (infoAgg) infoAgg.style.display = isAgg ? 'block' : 'none';
+
+  // Esconde busca por nome quando em modo agregado
+  var nomeFlt = document.getElementById('flt-nome-todos');
+  if (nomeFlt) nomeFlt.parentElement.style.display = isAgg ? 'none' : '';
+
+  if (isAgg && STATS[anoFiltro]) {
+    // Modo agregado — tabela resumida mensal
+    thead.innerHTML = '<tr><th>Mês</th><th>Pacientes</th><th>Receita</th><th>Ticket Médio</th><th>Procedimentos</th></tr>';
+    var st = STATS[anoFiltro];
+    var mesFiltro = _todFiltros.mes;
+    var totalPacs = 0, totalRec = 0;
+    var rows = MESES.map(function(mes, i) {
+      var cnt = st.meses_count[i];
+      var rec = st.meses[i];
+      if (mesFiltro && String(i + 1) !== mesFiltro) return '';
+      if (cnt === 0 && rec === 0) return '';
+      totalPacs += cnt;
+      totalRec += rec;
+      var ticket = cnt > 0 ? fmt(rec / cnt) : '—';
+      return '<tr><td style="font-weight:600">' + mes + '</td><td>' + cnt + '</td><td style="font-weight:600">' + fmt(rec) + '</td><td>' + ticket + '</td><td>' + Object.keys(st.tipos).map(function(t) { return '<span class="badge ' + tcls(t) + '">' + t + '</span>'; }).join(' ') + '</td></tr>';
+    }).filter(function(r) { return r; });
+
+    if (sub) sub.textContent = anoFiltro + ' — ' + totalPacs + ' pacientes · ' + fmt(totalRec) + ' receita total';
+    document.getElementById('nb-todos').textContent = totalPacs;
+
+    if (!rows.length) { tb.innerHTML = '<tr><td colspan="5" class="empty">Nenhum dado para este período</td></tr>'; return; }
+    tb.innerHTML = rows.join('') + '<tr style="background:var(--cvl);font-weight:600"><td>TOTAL</td><td>' + totalPacs + '</td><td>' + fmt(totalRec) + '</td><td>' + (totalPacs > 0 ? fmt(totalRec / totalPacs) : '—') + '</td><td></td></tr>';
+    return;
+  }
+
+  // Modo individual — tabela de pacientes
+  thead.innerHTML = '<tr><th>Paciente</th><th>Ano</th><th>Data</th><th>Procedimento</th><th>Pagamento</th><th>Valor</th><th>Parcelas</th><th style="width:90px">Ações</th></tr>';
+
+  // Junta todos os arrays PACS disponíveis
+  var todos = [];
+  _getPacsArrays().forEach(function(info) {
+    if (info.individual) todos = todos.concat(info.dados);
+  });
+  todos.sort(function(a, b) { return (b.dataISO || '').localeCompare(a.dataISO || ''); });
+
+  if (anoFiltro) todos = todos.filter(function(p) { return String(p.ano) === anoFiltro; });
+  if (_todFiltros.nome) todos = todos.filter(function(p) { return p.nome.toLowerCase().includes(_todFiltros.nome.toLowerCase()); });
+  if (_todFiltros.tipo) todos = todos.filter(function(p) { return p.tipo === _todFiltros.tipo; });
+  if (_todFiltros.pgto) todos = todos.filter(function(p) { return p.pgto === _todFiltros.pgto; });
+  if (_todFiltros.mes) todos = todos.filter(function(p) { return String(p.mes) === _todFiltros.mes; });
+
+  if (sub) sub.textContent = todos.length + ' registros encontrados';
+  document.getElementById('nb-todos').textContent = todos.length;
+
+  if (!todos.length) { tb.innerHTML = '<tr><td colspan="8" class="empty">Nenhum resultado</td></tr>'; return; }
+
+  // Guardar referência filtrada para edição/exclusão
+  window._todosFiltered = todos;
+
+  tb.innerHTML = todos.map(function(p, idx) {
+    var anoNum = Number(p.ano);
+    var maxAno = Math.max.apply(null, _getPacsArrays().filter(function(i){return i.individual;}).map(function(i){return i.ano;}));
+    var anoBadge = anoNum === maxAno
+      ? '<span style="color:var(--cvd);font-weight:600;font-size:11px">' + p.ano + '</span>'
+      : '<span style="color:var(--t3);font-size:11px">' + p.ano + '</span>';
+    var pips = p.n > 1
+      ? '<div class="pt">' + Array.from({length: p.n}, function(_, i) { return '<div class="pp ' + (i < (p.pago || 0) ? 'pp-pg' : 'pp-ft') + '" style="width:20px;height:20px;font-size:9px">' + (i + 1) + '</div>'; }).join('') + '</div>'
+      : '<span style="font-size:11px;color:var(--t3)">À vista</span>';
+    var acoes = '<div class="btn-row"><button class="btn-edit" onclick="window.abrirEditPac('+idx+')">✏️</button><button class="btn-del" onclick="window.deletarPac('+idx+')">🗑️</button></div>';
+    return '<tr><td class="nm">' + p.nome + '</td><td>' + anoBadge + '</td><td>' + (p.data || '—') + '</td><td><span class="badge ' + tcls(p.tipo) + '">' + p.tipo + '</span></td><td><span class="badge ' + pcls(p.pgto) + '">' + p.pgto + '</span></td><td style="font-weight:600">' + fmt(p.valor) + '</td><td>' + pips + '</td><td>' + acoes + '</td></tr>';
+  }).join('');
+}
+
+// ── RECALCULAR STATS E GRÁFICOS ──
+function recalcStats() {
+  _getPacsArrays().forEach(function(info) {
+    if (!info.individual) return;
+    var ano = info.ano;
+    if (!STATS[ano]) STATS[ano] = { meses:[0,0,0,0,0,0,0,0,0,0,0,0], meses_count:[0,0,0,0,0,0,0,0,0,0,0,0], tipos:{}, total:0, count:0 };
+    var s = STATS[ano];
+    s.meses = [0,0,0,0,0,0,0,0,0,0,0,0];
+    s.meses_count = [0,0,0,0,0,0,0,0,0,0,0,0];
+    s.tipos = {}; s.total = 0; s.count = 0;
+    info.dados.forEach(function(p) {
+      var mi = (p.mes || 1) - 1;
+      s.meses[mi] += p.valor || 0;
+      s.meses_count[mi]++;
+      s.total += p.valor || 0;
+      s.count++;
+      var t = p.tipo || 'OUTRO';
+      s.tipos[t] = (s.tipos[t] || 0) + 1;
+    });
+  });
+}
+
+function refreshDashboard() {
+  recalcStats();
+  // Reconstruir acumulados 2026
+  if (typeof ACC_2026 !== 'undefined' && STATS[2026]) {
+    var acc = 0;
+    for (var i = 0; i < 12; i++) { acc += STATS[2026].meses[i]; ACC_2026[i] = acc; }
+  }
+  // Atualizar métricas do topo
+  var mets = document.querySelectorAll('#page-dash .g5 .met');
+  if (mets.length >= 3 && STATS[2026]) {
+    mets[0].querySelector('.mv').textContent = STATS[2026].count;
+    mets[1].querySelector('.mv').textContent = fmt(STATS[2026].total);
+    mets[2].querySelector('.mv').textContent = STATS[2026].count > 0 ? fmt(Math.round(STATS[2026].total / STATS[2026].count)) : 'R$ 0';
+  }
+  // Reconstruir gráficos
+  try {
+    var activeYt = document.querySelector('#page-dash .ytab .yt.active');
+    var anoAtual = activeYt ? parseInt(activeYt.textContent) : 2026;
+    switchMensal(anoAtual, activeYt || document.querySelector('#page-dash .ytab .yt'));
+    buildAcum(); buildCrescent(); buildTicket(); buildPgto(); buildEvol(); buildRadar(); buildHeatmap();
+  } catch(e) { console.warn('refreshDashboard:', e); }
+}
+
+// ── EDITAR / EXCLUIR PACIENTE ──
+function _findPacIndex(pac) {
+  var arrays = _getPacsArrays();
+  for (var a = 0; a < arrays.length; a++) {
+    if (!arrays[a].individual) continue;
+    var arr = arrays[a].dados;
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] === pac) return { arr: arr, idx: i };
+    }
+  }
+  return null;
+}
+
+function abrirEditPac(filtIdx) {
+  var p = window._todosFiltered[filtIdx];
+  if (!p) return;
+  document.getElementById('ep-idx').value = filtIdx;
+  document.getElementById('ep-nome').value = p.nome || '';
+  document.getElementById('ep-data').value = p.dataISO || '';
+  document.getElementById('ep-valor').value = p.valor || '';
+  // Popula selects
+  var selTipo = document.getElementById('ep-tipo');
+  selTipo.innerHTML = tipos.map(function(t) { return '<option' + (t === p.tipo ? ' selected' : '') + '>' + t + '</option>'; }).join('');
+  var selPgto = document.getElementById('ep-pgto');
+  selPgto.innerHTML = pgtos.map(function(pg) { return '<option' + (pg === p.pgto ? ' selected' : '') + '>' + pg + '</option>'; }).join('');
+  document.getElementById('ep-msg').className = 'msg';
+  document.getElementById('modal-edit-pac').classList.add('active');
+}
+
+function fecharEditPac() {
+  document.getElementById('modal-edit-pac').classList.remove('active');
+}
+
+function salvarEditPac() {
+  var filtIdx = parseInt(document.getElementById('ep-idx').value);
+  var p = window._todosFiltered[filtIdx];
+  if (!p) return;
+
+  var nome = document.getElementById('ep-nome').value.trim().toUpperCase();
+  var dataISO = document.getElementById('ep-data').value;
+  var valor = parseFloat(document.getElementById('ep-valor').value);
+  var tipo = document.getElementById('ep-tipo').value;
+  var pgto = document.getElementById('ep-pgto').value;
+
+  if (!nome || !dataISO || !valor || !tipo || !pgto) {
+    showMsg('ep-msg', 'er', 'Preencha todos os campos.');
+    return;
+  }
+
+  var _d = new Date(dataISO + 'T12:00:00');
+  p.nome = nome;
+  p.dataISO = dataISO;
+  p.data = String(_d.getDate()).padStart(2, '0') + '/' + String(_d.getMonth() + 1).padStart(2, '0') + '/' + _d.getFullYear();
+  p.ano = _d.getFullYear();
+  p.mes = _d.getMonth() + 1;
+  p.valor = valor;
+  p.tipo = tipo;
+  p.pgto = pgto;
+  p.n = getNP(pgto);
+
+  // Salvar no localStorage
+  _syncPacsToLocalStorage();
+  atualizarIndicador();
+  refreshDashboard();
+  renderTodos();
+  fecharEditPac();
+}
+
+function deletarPac(filtIdx) {
+  var p = window._todosFiltered[filtIdx];
+  if (!p) return;
+  if (!confirm('Excluir o registro de "' + p.nome + '" (' + (p.data || p.dataISO) + ')?\nEsta ação não pode ser desfeita.')) return;
+
+  var ref = _findPacIndex(p);
+  if (ref) ref.arr.splice(ref.idx, 1);
+
+  // Remover da sessão também
+  var si = sessao.indexOf(p);
+  if (si >= 0) sessao.splice(si, 1);
+
+  _syncPacsToLocalStorage();
+  atualizarIndicador();
+  refreshDashboard();
+  renderTodos();
+  renderSessao();
+}
+
+function _syncPacsToLocalStorage() {
+  try {
+    // Salva apenas registros adicionados pelo usuário (com savedAt)
+    var todos = [];
+    _getPacsArrays().forEach(function(info) {
+      if (info.individual) {
+        info.dados.forEach(function(p) { if (p.savedAt) todos.push(p); });
+      }
+    });
+    localStorage.setItem(DB_KEY_PACS, JSON.stringify(todos));
+    var m = JSON.parse(localStorage.getItem(DB_KEY_META) || '{}');
+    m.lastSave = new Date().toISOString();
+    m.pacCount = todos.length;
+    localStorage.setItem(DB_KEY_META, JSON.stringify(m));
+  } catch (e) { console.warn('_syncPacsToLocalStorage:', e); }
+}
+
+// ── PARCELAMENTOS ──
+var ALL_PARC = [...PARC_2025.map(p=>({...p,anoLabel:'2025'})), ...PARC_2026.map(p=>({...p,anoLabel:'2026'}))];
+function buildParcStats(){
+  const t25=PARC_2025.reduce((a,p)=>a+p.valor,0);
+  const t26=PARC_2026.reduce((a,p)=>a+p.valor,0);
+  const rv=ALL_PARC.filter(p=>p.pago<p.n).reduce((a,p)=>a+(p.valor/p.n*(p.n-p.pago)),0);
+  document.getElementById('parc-tv25').textContent=fmt(t25);
+  document.getElementById('parc-tv26').textContent=fmt(t26);
+  document.getElementById('parc-rv').textContent=fmt(rv);
+  new Chart(document.getElementById('cParcM'),{type:'bar',data:{labels:MESES,datasets:[{label:'Recebido',data:[1840,2310,1950,1620,1380,980,0,0,0,0,0,0],backgroundColor:'#00A79D',borderRadius:3},{label:'A receber',data:[640,980,2840,3120,2680,1950,1240,620,400,280,180,100],backgroundColor:'rgba(0,167,157,.28)',borderRadius:3,borderWidth:1,borderColor:'#00A79D'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{beginAtZero:true,ticks:{font:{size:10},callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
+}
+function renderParc(lista){
+  const tb=document.getElementById('t-parc');
+  if(!lista.length){tb.innerHTML='<tr><td colspan="8" class="empty">Nenhum resultado</td></tr>';return;}
+  tb.innerHTML=lista.map(p=>{
+    const vpm=Math.round(p.valor/p.n);const pct=Math.round(((p.pago||0)/p.n)*100);
+    const pips=Array.from({length:p.n},(_,i)=>`<div class="pp ${i<(p.pago||0)?'pp-pg':'pp-ft'}" style="width:22px;height:22px;font-size:9px">${i+1}</div>`).join('');
+    const anoStyle=p.anoLabel==='2026'?'color:var(--cvd);font-weight:600':'color:var(--t3)';
+    return `<tr><td class="nm">${p.nome}</td><td><span style="${anoStyle}">${p.anoLabel}</span></td><td>${p.data}</td><td style="font-weight:600">${fmt(p.valor)}</td><td><span class="badge b-cred">${p.n}x</span></td><td>${fmt(vpm)}</td><td><div class="pt">${pips}</div></td><td><div style="min-width:55px"><div style="font-size:11px;font-weight:600;color:var(--cv)">${pct}%</div><div class="pb" style="width:55px"><div class="pbf" style="width:${pct}%"></div></div></div></td></tr>`;
+  }).join('');
+}
+function filtParc(q){renderParc(ALL_PARC.filter(p=>p.nome.toLowerCase().includes(q.toLowerCase())));}
+
+// ── BOLETOS ──
+var _bolFiltro = {busca:'', status:'', ano:''};
+function filtBol(campo, val){ _bolFiltro[campo]=val; renderBoletos(); }
+
+function renderBoletos(){
+  const sm={pend:{cls:'b-pnd',txt:'Pendente'},pago:{cls:'b-pg',txt:'Pago'},venc:{cls:'b-vnc',txt:'Vencido'}};
+  var lista = BOLETOS.map(function(b,i){ return {b:b, i:i}; });
+  if(_bolFiltro.busca) lista = lista.filter(function(x){ return x.b.desc.toLowerCase().includes(_bolFiltro.busca.toLowerCase()); });
+  if(_bolFiltro.status) lista = lista.filter(function(x){ return x.b.status === _bolFiltro.status; });
+  if(_bolFiltro.ano) lista = lista.filter(function(x){ return x.b.venc && x.b.venc.startsWith(_bolFiltro.ano); });
+  if(!lista.length){ document.getElementById('bol-list').innerHTML='<div class="empty">Nenhum boleto encontrado.</div>'; }
+  else {
+    document.getElementById('bol-list').innerHTML=lista.map(function(x){
+      var b=x.b, i=x.i; var s=sm[b.status]||sm.pend;
+      return '<div class="bi s'+(b.status==='pago'?'g':b.status==='venc'?'v':'p')+'" id="bol-item-'+i+'"><div style="flex:1"><div style="font-size:13px;font-weight:500">'+b.desc+'</div><div style="font-size:11px;color:var(--t3);margin-top:2px">'+(b.cat||'')+(b.cat?' · ':'')+' Venc: '+fmtDate(b.venc)+'</div></div><div style="text-align:right"><div style="font-family:Plus Jakarta Sans,sans-serif;font-size:15px;font-weight:700">'+fmt(b.val)+'</div><div style="margin-top:3px"><span class="badge '+s.cls+'">'+s.txt+'</span></div></div><div style="display:flex;gap:5px">'+(b.status!=='pago'?'<button class="bp" style="padding:6px 12px;font-size:11px" onclick="window.pagarBol('+i+')">✓ Pago</button>':'<button class="bs" style="padding:6px 12px;font-size:11px" onclick="window.reabrirBol('+i+')">Reabrir</button>')+'<button class="btn-danger" style="padding:6px 10px;font-size:11px;border-radius:6px" onclick="window.deletarBol('+i+')" title="Excluir boleto">🗑</button></div></div>';
+    }).join('');
+  }
+  const pend=BOLETOS.filter(b=>b.status!=='pago');const tot=pend.reduce((a,b)=>a+b.val,0);
+  document.getElementById('bol-total').textContent=fmt(tot);
+  document.getElementById('bol-ct').textContent=`${pend.length} pendente${pend.length!==1?'s':''}`;
+  document.getElementById('nb-bol').textContent=BOLETOS.filter(b=>b.status==='pend').length;
+  document.getElementById('kpi-bol').textContent=fmt(tot);
+  document.getElementById('kpi-bol-ct').textContent=`${pend.length} pendentes`;
+  const recFev=27745,bolFev=1313;
+  document.getElementById('bol-saldo').textContent=(recFev-bolFev>=0?'+ ':'')+fmt(recFev-bolFev);
+  document.getElementById('balanco-content').innerHTML=`<div class="bl-row"><span style="color:var(--t2)">Receita Jan/2026</span><span style="font-weight:600;color:var(--grn)">${fmt(20200)}</span></div><div class="bl-row"><span style="color:var(--t2)">Receita Fev/2026</span><span style="font-weight:600;color:var(--grn)">${fmt(27745)}</span></div><div class="bl-row"><span style="color:var(--t2)">Boletos pagos (Jan-Fev)</span><span style="font-weight:600;color:var(--red)">−${fmt(1313+2154)}</span></div><div class="bl-tot"><span style="font-size:13px;font-weight:600">Saldo acumulado Jan-Fev/2026</span><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:700;color:var(--cv)">${fmt(20200+27745-1313-2154)}</span></div>`;
+}
+function buildBolChart(){const ctx=document.getElementById('cBol');if(ctx._chart)ctx._chart.destroy();ctx._chart=new Chart(ctx,{type:'bar',data:{labels:MESES,datasets:[{label:'Recebível',data:[3200,4800,5200,5800,6200,5500,6800,7200,6900,7200,6800,8000],backgroundColor:'rgba(0,167,157,0.7)',borderRadius:4},{label:'Boletos',data:[-1313,-2154,-2944,-3100,-3000,-2500,-4000,-3000,-3000,-2500,-2200,-3200],backgroundColor:'rgba(229,62,62,.65)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{font:{size:10},callback:v=>(v<0?'-':'')+'R$'+Math.abs(Math.round(v/1000))+'k'}}}}});}
+function toggleAddBol(){const el=document.getElementById('add-bol-area');el.style.display=el.style.display==='none'?'block':'none';}
+function addBol(){const desc=document.getElementById('b-desc').value.trim();const val=parseFloat(document.getElementById('b-val').value);const venc=document.getElementById('b-venc').value;if(!desc||!val||!venc){showMsg('b-msg','er','Preencha todos os campos.');return;}const bol={desc,cat:document.getElementById('b-cat').value,val,venc,status:document.getElementById('b-st').value,savedAt:new Date().toISOString()};BOLETOS.unshift(bol);dbSaveBoleto(bol);renderBoletos();buildBolChart();atualizarIndicador();document.getElementById('add-bol-area').style.display='none';document.getElementById('b-desc').value='';document.getElementById('b-val').value='';showMsg('b-msg','ok','Boleto cadastrado e salvo no banco local!');}
+function pagarBol(i){BOLETOS[i].status='pago';dbSaveAllBoletos();dbUpdateBolStatus(BOLETOS[i],'pago');renderBoletos();buildBolChart();}
+function reabrirBol(i){BOLETOS[i].status='pend';dbSaveAllBoletos();dbUpdateBolStatus(BOLETOS[i],'pend');renderBoletos();buildBolChart();}
+function deletarBol(i){
+  var b = BOLETOS[i];
+  if (!confirm('Excluir o boleto "'+b.desc+'" ('+fmt(b.val)+')?\nEsta ação não pode ser desfeita.')) return;
+  BOLETOS.splice(i, 1);
+  dbSaveAllBoletos();
+  renderBoletos();
+  buildBolChart();
+  atualizarIndicador();
+  showMsg('b-msg','ok','Boleto excluído com sucesso!');
+  document.getElementById('add-bol-area').style.display='none';
+}
+
+// ── PROJEÇÃO 2026 ──
+function buildProj(){
+  // Projeção Mar-Dez 2026 baseada em 2025 + crescimento médio ~10%
+  const m2025 = STATS[2025].meses;
+  const projMeses = m2025.map((v,i)=>i<2?0:Math.round(v*1.10));
+  new Chart(document.getElementById('cProjR'),{type:'bar',
+    data:{labels:['Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+      datasets:[{data:projMeses.slice(2),backgroundColor:projMeses.slice(2).map((_,i)=>i<2?'rgba(0,167,157,0.4)':'rgba(0,167,157,0.25)'),borderRadius:4,borderWidth:1,borderColor:'#00A79D'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'Proj: R$ '+Math.round(c.raw).toLocaleString('pt-BR')}}},
+      scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',font:{size:10}}},x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+  // Comparativo Jan-Fev 3 anos
+  new Chart(document.getElementById('cProjComp'),{type:'bar',
+    data:{labels:['Janeiro','Fevereiro'],
+      datasets:[
+        {label:'2024',data:[STATS[2024].meses[0],STATS[2024].meses[1]],backgroundColor:'rgba(0,167,157,0.25)',borderRadius:4},
+        {label:'2025',data:[STATS[2025].meses[0],STATS[2025].meses[1]],backgroundColor:'rgba(0,167,157,0.55)',borderRadius:4},
+        {label:'2026',data:[STATS[2026].meses[0],STATS[2026].meses[1]],backgroundColor:'#00A79D',borderRadius:4}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{font:{size:11}}}},
+      scales:{y:{ticks:{callback:v=>'R$'+Math.round(v/1000)+'k',font:{size:10}}},x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+  // Tabela
+  const MESES_FULL=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  let acc=0;
+  document.getElementById('t-proj').innerHTML=MESES_FULL.map((mes,i)=>{
+    const real = i<2;
+    const val = real ? STATS[2026].meses[i] : projMeses[i];
+    const vs25 = m2025[i]>0 ? Math.round((val-m2025[i])/m2025[i]*100) : 0;
+    acc += val;
+    const status = real ? `<span class="badge b-pg">Real</span>` : `<span class="badge b-pnd">Projetado</span>`;
+    return `<tr style="${real?'background:rgba(0,167,157,0.03)':''}"><td style="font-weight:600">${mes}</td><td>${status}</td><td style="font-weight:600;color:${real?'var(--cvd)':'var(--t2)'}">${fmt(val)}</td><td><span style="color:${vs25>=0?'var(--grn)':'var(--red)'};font-weight:600">${vs25>=0?'+':''}${vs25}%</span></td><td style="color:var(--t3)">${fmt(acc)}</td></tr>`;
+  }).join('');
+}
+
+// ── CADASTRO ──
+function buildSelects(){const st=document.getElementById('f-tipo'),sp=document.getElementById('f-pgto'),ft=document.getElementById('flt-tipo25');if(st)st.innerHTML='<option value="">Selecionar...</option>'+tipos.map(t=>`<option>${t}</option>`).join('');if(sp)sp.innerHTML='<option value="">Selecionar...</option>'+pgtos.map(p=>`<option>${p}</option>`).join('');if(ft)ft.innerHTML='<option value="">Todos os procedimentos</option>'+tipos.map(t=>`<option>${t}</option>`).join('');}
+function onPgto(){const p=document.getElementById('f-pgto').value,n=getNP(p),pg=document.getElementById('f-parc-grp'),pv=document.getElementById('ppv');pg.style.display=n>1?'flex':'none';pv.style.display=n>1?'block':'none';calcParc();}
+function calcParc(){const p=document.getElementById('f-pgto').value,vv=parseFloat(document.getElementById('f-valor').value)||0,n=getNP(p);if(n>1&&vv>0){document.getElementById('f-parcela').value=fmt(vv/n);const hoje=new Date();document.getElementById('ppv-boxes').innerHTML=Array.from({length:n},(_,i)=>{const m=new Date(hoje.getFullYear(),hoje.getMonth()+i,1);return `<div class="pp pp-ft" title="${MESES[m.getMonth()]}: ${fmt(vv/n)}">${MESES[m.getMonth()]}</div>`;}).join('');document.getElementById('ppv-txt').textContent=`${n} parcelas de ${fmt(vv/n)} · Total: ${fmt(vv)}`;}}
+function salvar(){const nome=document.getElementById('f-nome').value.trim(),data=document.getElementById('f-data').value,tipo=document.getElementById('f-tipo').value,pgto=document.getElementById('f-pgto').value,valor=parseFloat(document.getElementById('f-valor').value);if(!nome||!data||!tipo||!pgto||!valor){showMsg('f-msg','er','Preencha todos os campos obrigatórios.');return;}const n=getNP(pgto);const _d=new Date(data+'T12:00:00');const reg={nome:nome.toUpperCase(),data:String(_d.getDate()).padStart(2,'0')+'/'+String(_d.getMonth()+1).padStart(2,'0')+'/'+_d.getFullYear(),dataISO:data,ano:_d.getFullYear(),mes:_d.getMonth()+1,tipo,pgto,valor,n,pago:0,savedAt:new Date().toISOString()};sessao.push(reg);PACS_2026.unshift(reg);dbSavePaciente(reg);renderTodos();renderSessao();atualizarIndicador();refreshDashboard();showMsg('f-msg','ok',`"${nome}" salvo e gravado no banco local!`);limpar(true);}
+function limpar(k){['f-nome','f-obs','f-valor'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});['f-unid','f-tipo','f-pgto'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('f-data').value=new Date().toISOString().split('T')[0];document.getElementById('f-parc-grp').style.display='none';document.getElementById('ppv').style.display='none';document.getElementById('ac-list').className='ac-list';document.getElementById('ac-hint').className='ac-hint';if(!k)document.getElementById('f-msg').className='msg';}
+function renderSessao(){const ct=document.getElementById('sess-ct');ct.textContent=sessao.length?`(${sessao.length})`:'';;const tb=document.getElementById('t-sess');if(!sessao.length){tb.innerHTML='<tr><td colspan="7" class="empty">Nenhum registro</td></tr>';return;}tb.innerHTML=sessao.map(p=>{const d=new Date(p.dataISO+'T12:00:00');const df=`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;const pips=p.n>1?`<div class="pt">${Array.from({length:p.n},(_,i)=>`<div class="pp ${i===0?'pp-pg':'pp-ft'}" style="width:22px;height:22px;font-size:9px">${i+1}</div>`).join('')}</div>`:'<span style="font-size:11px;color:var(--t3)">À vista</span>';return `<tr><td class="nm">${p.nome}</td><td>${df}</td><td style="font-size:11px;color:var(--t3)">Colatina</td><td><span class="badge ${tcls(p.tipo)}">${p.tipo}</span></td><td><span class="badge ${pcls(p.pgto)}">${p.pgto}</span></td><td style="font-weight:600">${fmt(p.valor)}</td><td>${pips}</td></tr>`;}).join('');}
+
+// ── AUTOCOMPLETE NOME ──
+var _acIdx = -1;
+var _acResults = [];
+
+function _getAllNomesUnicos() {
+  var nomes = {};
+  var lista = [];
+  _getPacsArrays().forEach(function(info) {
+    if (!info.individual) return;
+    info.dados.forEach(function(p) {
+      var key = p.nome;
+      if (!nomes[key]) {
+        nomes[key] = { nome: p.nome, tipo: p.tipo, pgto: p.pgto, valor: p.valor, ultimo: p.data || p.dataISO, count: 1 };
+        lista.push(nomes[key]);
+      } else {
+        nomes[key].count++;
+        if ((p.dataISO || '') > (nomes[key].ultimoISO || '')) {
+          nomes[key].ultimo = p.data || p.dataISO;
+          nomes[key].tipo = p.tipo;
+          nomes[key].pgto = p.pgto;
+          nomes[key].valor = p.valor;
+        }
+      }
+    });
+  });
+  return lista;
+}
+
+function acBuscar(q) {
+  var list = document.getElementById('ac-list');
+  var hint = document.getElementById('ac-hint');
+  if (!q || q.length < 2) { list.className = 'ac-list'; hint.className = 'ac-hint'; _acResults = []; _acIdx = -1; return; }
+
+  var termo = q.toUpperCase();
+  _acResults = _getAllNomesUnicos().filter(function(n) {
+    return n.nome.includes(termo);
+  }).slice(0, 8);
+
+  _acIdx = -1;
+  if (!_acResults.length) { list.className = 'ac-list'; hint.className = 'ac-hint'; return; }
+
+  list.innerHTML = _acResults.map(function(r, i) {
+    var highlighted = r.nome.replace(new RegExp('(' + termo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'), '<strong style="color:var(--cvd)">$1</strong>');
+    return '<div class="ac-item" onmousedown="window.acSelecionar(' + i + ')" onmouseover="window._acIdx=' + i + ';window._acHighlight()">' +
+      '<span class="ac-name">' + highlighted + '</span>' +
+      '<span class="ac-info"><span>' + r.tipo + '</span><span>' + r.count + 'x</span></span>' +
+    '</div>';
+  }).join('');
+  list.className = 'ac-list show';
+}
+
+function acSelecionar(i) {
+  var r = _acResults[i];
+  if (!r) return;
+  document.getElementById('f-nome').value = r.nome;
+  document.getElementById('ac-list').className = 'ac-list';
+  document.getElementById('ac-hint').className = 'ac-hint show';
+
+  // Preencher campos com os dados do último atendimento
+  var selTipo = document.getElementById('f-tipo');
+  if (selTipo) { for (var o = 0; o < selTipo.options.length; o++) { if (selTipo.options[o].value === r.tipo) { selTipo.selectedIndex = o; break; } } }
+  var selPgto = document.getElementById('f-pgto');
+  if (selPgto) { for (var o = 0; o < selPgto.options.length; o++) { if (selPgto.options[o].value === r.pgto) { selPgto.selectedIndex = o; break; } } }
+  if (r.valor) document.getElementById('f-valor').value = r.valor;
+  onPgto();
+  _acResults = []; _acIdx = -1;
+}
+
+function acKeydown(e) {
+  var list = document.getElementById('ac-list');
+  if (!list.classList.contains('show') || !_acResults.length) return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); _acIdx = Math.min(_acIdx + 1, _acResults.length - 1); _acHighlight(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); _acIdx = Math.max(_acIdx - 1, 0); _acHighlight(); }
+  else if (e.key === 'Enter' && _acIdx >= 0) { e.preventDefault(); acSelecionar(_acIdx); }
+  else if (e.key === 'Escape') { list.className = 'ac-list'; _acIdx = -1; }
+}
+
+function _acHighlight() {
+  var items = document.querySelectorAll('#ac-list .ac-item');
+  items.forEach(function(el, i) { el.classList.toggle('active', i === _acIdx); });
+}
+
+// Fechar autocomplete ao clicar fora
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.ac-wrap')) {
+    document.getElementById('ac-list').className = 'ac-list';
+  }
+});
+
+// ── CHIPS ──
+function renderChips(){const ct=document.getElementById('chips-tipo'),cp=document.getElementById('chips-pgto');if(ct)ct.innerHTML=tipos.map((t,i)=>`<div class="chip">${t}<span class="cx" onclick="window.delTipo(${i})">×</span></div>`).join('');if(cp)cp.innerHTML=pgtos.map((p,i)=>`<div class="chip">${p}<span class="cx" onclick="window.delPgto(${i})">×</span></div>`).join('');buildSelects();}
+function _saveTiposPgtos(){try{localStorage.setItem(DB_KEY_TIPOS,JSON.stringify(tipos));localStorage.setItem(DB_KEY_PGTOS,JSON.stringify(pgtos));}catch(e){console.warn('_saveTiposPgtos:',e);}}
+function addTipo(){const v=document.getElementById('new-tipo').value.trim().toUpperCase();if(v&&!tipos.includes(v)){tipos.push(v);document.getElementById('new-tipo').value='';renderChips();buildTodosSelects();_saveTiposPgtos();}}
+function delTipo(i){tipos.splice(i,1);renderChips();buildTodosSelects();_saveTiposPgtos();}
+function addPgto(){const v=document.getElementById('new-pgto').value.trim().toUpperCase();if(v&&!pgtos.includes(v)){pgtos.push(v);document.getElementById('new-pgto').value='';renderChips();buildTodosSelects();_saveTiposPgtos();}}
+function delPgto(i){pgtos.splice(i,1);renderChips();buildTodosSelects();_saveTiposPgtos();}
+
+// ══ BANCO — n8n API + localStorage (fallback) ══
+var API_BASE = 'https://bleatingtortoise-n8n.cloudfy.live/webhook';
+var DB_KEY_PACS = 'clivped_fabiana_pacientes_v1';
+var DB_KEY_BOLS = 'clivped_fabiana_boletos_v1';
+var DB_KEY_META = 'clivped_fabiana_meta_v1';
+var DB_KEY_TIPOS = 'clivped_fabiana_tipos_v1';
+var DB_KEY_PGTOS = 'clivped_fabiana_pgtos_v1';
+
+function _apiPost(endpoint, data) {
+  return fetch(API_BASE + endpoint, {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
+  }).then(function(r){ return r.text().then(function(t){ try { return JSON.parse(t); } catch(e){ return {success: r.ok}; } }); })
+    .catch(function(e){ console.warn('API POST erro:', e); return {success:false}; });
+}
+
+function _apiGet(endpoint) {
+  return fetch(API_BASE + endpoint)
+    .then(function(r){ return r.text().then(function(t){ try { return JSON.parse(t); } catch(e){ return null; } }); })
+    .catch(function(e){ console.warn('API GET erro:', e); return null; });
+}
+
+function _apiPatch(endpoint, data) {
+  return fetch(API_BASE + endpoint, {
+    method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
+  }).then(function(r){ return r.text().then(function(t){ try { return JSON.parse(t); } catch(e){ return {success: r.ok}; } }); })
+    .catch(function(e){ console.warn('API PATCH erro:', e); return {success:false}; });
+}
+
+function dbSavePaciente(reg) {
+  // localStorage (fallback)
+  try {
+    var ex = JSON.parse(localStorage.getItem(DB_KEY_PACS) || '[]');
+    ex.unshift(reg);
+    localStorage.setItem(DB_KEY_PACS, JSON.stringify(ex));
+    var m = JSON.parse(localStorage.getItem(DB_KEY_META) || '{}');
+    m.lastSave = new Date().toISOString();
+    m.pacCount = ex.length;
+    localStorage.setItem(DB_KEY_META, JSON.stringify(m));
+  } catch(e) { console.warn('dbSavePaciente localStorage:', e); }
+  // n8n API
+  _apiPost('/clivped-pacientes', reg).then(function(resp) {
+    if (resp && resp.success) console.log('Paciente salvo na API');
+    else console.warn('API pacientes: resposta sem confirmação');
+  });
+}
+
+function dbSaveBoleto(bol) {
+  // localStorage (fallback)
+  try {
+    var ex = JSON.parse(localStorage.getItem(DB_KEY_BOLS) || '[]');
+    ex.unshift(bol);
+    localStorage.setItem(DB_KEY_BOLS, JSON.stringify(ex));
+  } catch(e) {}
+  // n8n API
+  _apiPost('/clivped-boletos', bol).then(function(resp) {
+    if (resp && resp.success) {
+      if (resp.data && resp.data.id) bol._apiId = resp.data.id;
+      console.log('Boleto salvo na API', resp);
+    }
+  });
+}
+
+function dbSaveAllBoletos() {
+  try {
+    var sb = BOLETOS.filter(function(b){ return !!b.savedAt; });
+    localStorage.setItem(DB_KEY_BOLS, JSON.stringify(sb));
+  } catch(e) {}
+}
+
+function dbUpdateBolStatus(bol, newStatus) {
+  if (bol._apiId) {
+    _apiPatch('/clivped-boletos', {id: bol._apiId, status: newStatus}).then(function(resp) {
+      if (resp && resp.success) console.log('Boleto atualizado na API');
+    });
+  }
+}
+
+function dbLoad() {
+  // 1. Carregar do localStorage (instantâneo)
+  try {
+    var sp = JSON.parse(localStorage.getItem(DB_KEY_PACS) || '[]');
+    if (sp.length > 0) {
+      var nomes = {};
+      PACS_2026.forEach(function(p){ nomes[p.nome + (p.dataISO||'')] = 1; });
+      sp.forEach(function(p){
+        if (!nomes[p.nome + (p.dataISO||'')]) {
+          if (!p.ano && p.dataISO) { var _dd=new Date(p.dataISO+'T12:00:00'); p.ano=_dd.getFullYear(); p.mes=_dd.getMonth()+1; p.data=String(_dd.getDate()).padStart(2,'0')+'/'+String(_dd.getMonth()+1).padStart(2,'0')+'/'+_dd.getFullYear(); }
+          PACS_2026.unshift(p); sessao.push(p);
+        }
+      });
+    }
+    var sb = JSON.parse(localStorage.getItem(DB_KEY_BOLS) || '[]');
+    if (sb.length > 0) {
+      var descs = {};
+      BOLETOS.forEach(function(b){ descs[b.desc + b.venc] = 1; });
+      sb.forEach(function(b){ if (!descs[b.desc + b.venc]) { BOLETOS.unshift(b); } });
+    }
+    // Carregar tipos e pagamentos personalizados
+    var st = JSON.parse(localStorage.getItem(DB_KEY_TIPOS) || 'null');
+    if (st && Array.isArray(st)) { st.forEach(function(t){ if(!tipos.includes(t)) tipos.push(t); }); }
+    var sp2 = JSON.parse(localStorage.getItem(DB_KEY_PGTOS) || 'null');
+    if (sp2 && Array.isArray(sp2)) { sp2.forEach(function(p){ if(!pgtos.includes(p)) pgtos.push(p); }); }
+  } catch(e) { console.warn('dbLoad localStorage:', e); }
+
+  // 2. Carregar da API n8n (assíncrono — atualiza depois)
+  _apiGet('/clivped-pacientes').then(function(resp) {
+    if (resp && resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
+      var nomes = {};
+      PACS_2026.forEach(function(p){ nomes[p.nome + (p.dataISO||'')] = 1; });
+      var added = 0;
+      resp.data.forEach(function(p) {
+        if (!p.ano && p.dataISO) { var _dd=new Date(p.dataISO+'T12:00:00'); p.ano=_dd.getFullYear(); p.mes=_dd.getMonth()+1; }
+        if (!nomes[p.nome + (p.dataISO||'')]) { PACS_2026.unshift(p); added++; nomes[p.nome + (p.dataISO||'')] = 1; }
+      });
+      if (added > 0) { renderTodos(); atualizarIndicador(); console.log('API: ' + added + ' pacientes carregados'); }
+    }
+  });
+
+  _apiGet('/clivped-boletos').then(function(resp) {
+    if (resp && resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
+      var descs = {};
+      BOLETOS.forEach(function(b){ descs[(b.desc||b.descricao) + (b.venc||b.data_vencimento)] = 1; });
+      var added = 0;
+      resp.data.forEach(function(b) {
+        var bol = {desc: b.descricao||b.desc, cat: b.categoria||b.cat, val: Number(b.valor||b.val), venc: (b.venc||b.data_vencimento||'').split('T')[0], status: b.status, _apiId: b.id, savedAt: b.created_at};
+        if (!descs[bol.desc + bol.venc]) { BOLETOS.unshift(bol); added++; }
+      });
+      if (added > 0) { renderBoletos(); buildBolChart(); atualizarIndicador(); console.log('API: ' + added + ' boletos carregados'); }
+    }
+  });
+}
+
+function atualizarIndicador() {
+  try {
+    var pacs = JSON.parse(localStorage.getItem(DB_KEY_PACS) || '[]');
+    var bols = JSON.parse(localStorage.getItem(DB_KEY_BOLS) || '[]');
+    var meta = JSON.parse(localStorage.getItem(DB_KEY_META) || '{}');
+    var total = pacs.length + bols.length;
+    var dot   = document.getElementById('db-dot');
+    var label = document.getElementById('db-label');
+    if (dot && label) {
+      if (total > 0) {
+        dot.style.background = '#1D9E75';
+        label.style.color    = '#2F855A';
+        label.textContent    = '💾' + total + ' registro' + (total !== 1 ? 's' : '') + ' salvos';
+      } else {
+        dot.style.background = '#4DC9C2';
+        label.style.color    = 'var(--t3)';
+        label.textContent    = 'Banco local ativo';
+      }
+    }
+    var ep = document.getElementById('db-pacs-ct');
+    var eb = document.getElementById('db-bols-ct');
+    var el = document.getElementById('db-last');
+    var es = document.getElementById('db-size');
+    if (ep) ep.textContent = pacs.length;
+    if (eb) eb.textContent = bols.length;
+    if (el) el.textContent = meta.lastSave
+      ? new Date(meta.lastSave).toLocaleString('pt-BR')
+      : (total > 0 ? 'Nesta sessão' : '—');
+    if (es) {
+      var bytes = (localStorage.getItem(DB_KEY_PACS)||'').length +
+                  (localStorage.getItem(DB_KEY_BOLS)||'').length;
+      es.textContent = bytes > 1024 ? (bytes/1024).toFixed(1)+' KB' : bytes+' bytes';
+    }
+  } catch(e) {}
+}
+
+function exportarCSV() {
+  try {
+    var pacs = JSON.parse(localStorage.getItem(DB_KEY_PACS) || '[]');
+    if (!pacs.length) { showMsg('db-msg','er','Nenhum paciente cadastrado ainda.'); return; }
+    var rows = pacs.map(function(p){
+      return '"'+p.nome+'","'+p.data+'","'+p.tipo+'","'+p.pgto+'","'+p.valor+'","'+p.n+'","'+(p.savedAt||'')+'"';
+    });
+    var csv = 'Nome,Data,Procedimento,Pagamento,Valor,Parcelas,Salvo em\n' + rows.join('\n');
+    var blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url;
+    a.download = 'clivped_pacientes_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showMsg('db-msg','ok', pacs.length + ' pacientes exportados com sucesso!');
+  } catch(e) { showMsg('db-msg','er','Erro ao exportar: '+e.message); }
+}
+
+function exportarBoletos() {
+  try {
+    var bols = JSON.parse(localStorage.getItem(DB_KEY_BOLS) || '[]');
+    if (!bols.length) { showMsg('db-msg','er','Nenhum boleto cadastrado ainda.'); return; }
+    var rows = bols.map(function(b){
+      return '"'+b.desc+'","'+(b.cat||'')+'","'+b.val+'","'+b.venc+'","'+b.status+'"';
+    });
+    var csv = 'Descrição,Categoria,Valor,Vencimento,Status\n' + rows.join('\n');
+    var blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url;
+    a.download = 'clivped_boletos_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showMsg('db-msg','ok', bols.length + ' boletos exportados!');
+  } catch(e) { showMsg('db-msg','er','Erro ao exportar: '+e.message); }
+}
+
+function limparBanco() {
+  var pacs = JSON.parse(localStorage.getItem(DB_KEY_PACS) || '[]');
+  var bols = JSON.parse(localStorage.getItem(DB_KEY_BOLS) || '[]');
+  var total = pacs.length + bols.length;
+  if (!total) { showMsg('db-msg','er','O banco já está vazio.'); return; }
+  if (!confirm('Tem certeza? Isso vai apagar ' + total + ' registro(s) do banco local.\n\nDica: exporte primeiro!')) return;
+  localStorage.removeItem(DB_KEY_PACS);
+  localStorage.removeItem(DB_KEY_BOLS);
+  localStorage.removeItem(DB_KEY_META);
+  sessao.length = 0;
+  renderSessao();
+  atualizarIndicador();
+  showMsg('db-msg','ok','Banco local limpo. Dados da planilha original continuam disponíveis.');
+}
+
+
+// ── INIT ──
+buildSelects(); renderChips(); buildTodosSelects();
+dbLoad();
+recalcStats();
+if (typeof ACC_2026 !== 'undefined' && STATS[2026]) { var _acc=0; for(var _i=0;_i<12;_i++){_acc+=STATS[2026].meses[_i];ACC_2026[_i]=_acc;} }
+switchMensal(2026, document.querySelector('.ytab .yt.active'));
+buildAcum(); buildCrescent(); buildTicket(); buildPgto(); buildEvol(); buildRadar(); buildBal(); buildHeatmap();
+renderTodos();
+renderParc(ALL_PARC); buildParcStats();
+renderBoletos(); buildBolChart(); buildProj();
+document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
+document.getElementById('b-venc').value = new Date().toISOString().split('T')[0];
+
+// ── Expor ao window para acesso global ──
+if (typeof goto !== "undefined") window.goto = goto;
+if (typeof switchMensal !== "undefined") window.switchMensal = switchMensal;
+if (typeof buildAcum !== "undefined") window.buildAcum = buildAcum;
+if (typeof buildCrescent !== "undefined") window.buildCrescent = buildCrescent;
+if (typeof buildTicket !== "undefined") window.buildTicket = buildTicket;
+if (typeof buildPgto !== "undefined") window.buildPgto = buildPgto;
+if (typeof buildEvol !== "undefined") window.buildEvol = buildEvol;
+if (typeof buildRadar !== "undefined") window.buildRadar = buildRadar;
+if (typeof buildBal !== "undefined") window.buildBal = buildBal;
+if (typeof buildHeatmap !== "undefined") window.buildHeatmap = buildHeatmap;
+if (typeof renderTodos !== "undefined") window.renderTodos = renderTodos;
+if (typeof filtAnoTodos !== "undefined") window.filtAnoTodos = filtAnoTodos;
+if (typeof filtTodos !== "undefined") window.filtTodos = filtTodos;
+if (typeof buildTodosSelects !== "undefined") window.buildTodosSelects = buildTodosSelects;
+if (typeof recalcStats !== "undefined") window.recalcStats = recalcStats;
+if (typeof refreshDashboard !== "undefined") window.refreshDashboard = refreshDashboard;
+if (typeof abrirEditPac !== "undefined") window.abrirEditPac = abrirEditPac;
+if (typeof fecharEditPac !== "undefined") window.fecharEditPac = fecharEditPac;
+if (typeof salvarEditPac !== "undefined") window.salvarEditPac = salvarEditPac;
+if (typeof deletarPac !== "undefined") window.deletarPac = deletarPac;
+if (typeof acBuscar !== "undefined") window.acBuscar = acBuscar;
+if (typeof acSelecionar !== "undefined") window.acSelecionar = acSelecionar;
+if (typeof acKeydown !== "undefined") window.acKeydown = acKeydown;
+if (typeof _acHighlight !== "undefined") window._acHighlight = _acHighlight;
+if (typeof renderParc !== "undefined") window.renderParc = renderParc;
+if (typeof filtParc !== "undefined") window.filtParc = filtParc;
+if (typeof buildParcStats !== "undefined") window.buildParcStats = buildParcStats;
+if (typeof renderBoletos !== "undefined") window.renderBoletos = renderBoletos;
+if (typeof buildBolChart !== "undefined") window.buildBolChart = buildBolChart;
+if (typeof toggleAddBol !== "undefined") window.toggleAddBol = toggleAddBol;
+if (typeof addBol !== "undefined") window.addBol = addBol;
+if (typeof pagarBol !== "undefined") window.pagarBol = pagarBol;
+if (typeof reabrirBol !== "undefined") window.reabrirBol = reabrirBol;
+if (typeof deletarBol !== "undefined") window.deletarBol = deletarBol;
+if (typeof filtBol !== "undefined") window.filtBol = filtBol;
+if (typeof buildProj !== "undefined") window.buildProj = buildProj;
+if (typeof salvar !== "undefined") window.salvar = salvar;
+if (typeof limpar !== "undefined") window.limpar = limpar;
+if (typeof renderSessao !== "undefined") window.renderSessao = renderSessao;
+if (typeof renderChips !== "undefined") window.renderChips = renderChips;
+if (typeof addTipo !== "undefined") window.addTipo = addTipo;
+if (typeof delTipo !== "undefined") window.delTipo = delTipo;
+if (typeof addPgto !== "undefined") window.addPgto = addPgto;
+if (typeof delPgto !== "undefined") window.delPgto = delPgto;
+if (typeof buildSelects !== "undefined") window.buildSelects = buildSelects;
+if (typeof onPgto !== "undefined") window.onPgto = onPgto;
+if (typeof calcParc !== "undefined") window.calcParc = calcParc;
+if (typeof dbSavePaciente !== "undefined") window.dbSavePaciente = dbSavePaciente;
+if (typeof dbSaveBoleto !== "undefined") window.dbSaveBoleto = dbSaveBoleto;
+if (typeof dbSaveAllBoletos !== "undefined") window.dbSaveAllBoletos = dbSaveAllBoletos;
+if (typeof dbUpdateBolStatus !== "undefined") window.dbUpdateBolStatus = dbUpdateBolStatus;
+if (typeof dbLoad !== "undefined") window.dbLoad = dbLoad;
+if (typeof atualizarIndicador !== "undefined") window.atualizarIndicador = atualizarIndicador;
+if (typeof exportarCSV !== "undefined") window.exportarCSV = exportarCSV;
+if (typeof exportarBoletos !== "undefined") window.exportarBoletos = exportarBoletos;
+if (typeof limparBanco !== "undefined") window.limparBanco = limparBanco;
+if (typeof showMsg !== "undefined") window.showMsg = showMsg;
+if (typeof fmt !== "undefined") window.fmt = fmt;
+if (typeof fmtK !== "undefined") window.fmtK = fmtK;
+if (typeof getNP !== "undefined") window.getNP = getNP;
+if (typeof fmtDate !== "undefined") window.fmtDate = fmtDate;
+if (typeof tcls !== "undefined") window.tcls = tcls;
+if (typeof pcls !== "undefined") window.pcls = pcls;
+if (typeof MESES !== "undefined") window.MESES = MESES;
+if (typeof PACS_2026 !== "undefined") window.PACS_2026 = PACS_2026;
+if (typeof PACS_2025 !== "undefined") window.PACS_2025 = PACS_2025;
+if (typeof PARC_2025 !== "undefined") window.PARC_2025 = PARC_2025;
+if (typeof PARC_2026 !== "undefined") window.PARC_2026 = PARC_2026;
+if (typeof BOLETOS !== "undefined") window.BOLETOS = BOLETOS;
+if (typeof STATS !== "undefined") window.STATS = STATS;
+if (typeof RECEITA_HIST !== "undefined") window.RECEITA_HIST = RECEITA_HIST;
+if (typeof PACS_HIST !== "undefined") window.PACS_HIST = PACS_HIST;
+if (typeof TICKETS_HIST !== "undefined") window.TICKETS_HIST = TICKETS_HIST;
+if (typeof ANOS !== "undefined") window.ANOS = ANOS;
+if (typeof ACC_2024 !== "undefined") window.ACC_2024 = ACC_2024;
+if (typeof ACC_2025 !== "undefined") window.ACC_2025 = ACC_2025;
+if (typeof ACC_2026 !== "undefined") window.ACC_2026 = ACC_2026;
+if (typeof tipos !== "undefined") window.tipos = tipos;
+if (typeof pgtos !== "undefined") window.pgtos = pgtos;
+if (typeof sessao !== "undefined") window.sessao = sessao;
+if (typeof charts !== "undefined") window.charts = charts;
+atualizarIndicador();
+</script>
+</body>
+</html>
